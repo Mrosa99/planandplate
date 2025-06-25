@@ -131,13 +131,13 @@ const Navbar1 = ({
     },
   ],
   auth = {
-    login: { title: "Login", url: "#" },
-    signup: { title: "Sign up", url: "#" },
+    login: { title: "Login", url: "/login" },
+    signup: { title: "Sign up", url: "/signup" },
   },
 }: Navbar1Props) => {
   return (
-    <section className="py-4">
-      <div className="container">
+    <section className="sticky top-0 z-50 py-3">
+      <div className="container mx-auto flex w-full items-center">
         {/* Desktop Menu */}
         <nav className="hidden justify-between lg:flex w-full items-center">
           <div className="flex items-center gap-6">
@@ -167,8 +167,8 @@ const Navbar1 = ({
         </nav>
 
         {/* Mobile Menu */}
-        <div className="block lg:hidden">
-          <div className="flex items-center justify-between">
+        <div className="block lg:hidden justify-between w-full">
+          <div className="flex items-center justify-between pl-5 pr-5">
             {/* Logo */}
             <a href={logo.url} className="flex items-center gap-2">
               <img src={logo.src} className="max-h-8" alt={logo.alt} />
