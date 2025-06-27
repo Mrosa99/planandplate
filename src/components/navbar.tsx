@@ -33,7 +33,6 @@ interface MenuItem {
 
 interface Navbar1Props {
   logo?: {
-    url: string;
     src: string;
     alt: string;
     title: string;
@@ -53,80 +52,48 @@ interface Navbar1Props {
 
 const Navbar1 = ({
   logo = {
-    url: "https://www.shadcnblocks.com",
     src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/shadcnblockscom-icon.svg",
     alt: "logo",
-    title: "Shadcnblocks.com",
+    title: "Plan and Plate",
   },
   menu = [
-    { title: "Home", url: "#" },
+    { title: "Home", url: "/" },
     {
-      title: "Products",
+      title: "Recipes",
       url: "#",
       items: [
         {
-          title: "Blog",
-          description: "The latest industry news, updates, and info",
+          title: "Trending",
+          description: "Recipes that are getting the most attention right now.",
           icon: <Book className="size-5 shrink-0" />,
-          url: "#",
+          url: "/recipes",
         },
         {
-          title: "Company",
-          description: "Our mission is to innovate and empower the world",
+          title: "Most Saved",
+          description: "The recipes users love and save the most.",
           icon: <Trees className="size-5 shrink-0" />,
-          url: "#",
+          url: "/recipes",
         },
         {
-          title: "Careers",
-          description: "Browse job listing and discover our workspace",
+          title: "New Recipes",
+          description: "The latest additions fresh from the recipe feed.",
           icon: <Sunset className="size-5 shrink-0" />,
-          url: "#",
+          url: "/recipes",
         },
         {
-          title: "Support",
-          description:
-            "Get in touch with our support team or visit our community forums",
+          title: "Random Recipe",
+          description: "Get a surprise recipe with one click.",
           icon: <Zap className="size-5 shrink-0" />,
-          url: "#",
+          url: "/recipes",
         },
       ],
     },
     {
-      title: "Resources",
-      url: "#",
-      items: [
-        {
-          title: "Help Center",
-          description: "Get all the answers you need right here",
-          icon: <Zap className="size-5 shrink-0" />,
-          url: "#",
-        },
-        {
-          title: "Contact Us",
-          description: "We are here to help you with any questions you have",
-          icon: <Sunset className="size-5 shrink-0" />,
-          url: "#",
-        },
-        {
-          title: "Status",
-          description: "Check the current status of our services and APIs",
-          icon: <Trees className="size-5 shrink-0" />,
-          url: "#",
-        },
-        {
-          title: "Terms of Service",
-          description: "Our terms and conditions for using our services",
-          icon: <Book className="size-5 shrink-0" />,
-          url: "#",
-        },
-      ],
+      title: "Categories",
+      url: "/categories",
     },
     {
-      title: "Pricing",
-      url: "#",
-    },
-    {
-      title: "Blog",
+      title: "Search",
       url: "#",
     },
   ],
@@ -142,12 +109,12 @@ const Navbar1 = ({
         <nav className="hidden justify-between lg:flex w-full items-center">
           <div className="flex items-center gap-6">
             {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <img src={logo.src} className="max-h-8" alt={logo.alt} />
               <span className="text-lg font-semibold tracking-tighter">
                 {logo.title}
               </span>
-            </a>
+            </div>
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>
@@ -170,9 +137,9 @@ const Navbar1 = ({
         <div className="block lg:hidden justify-between w-full">
           <div className="flex items-center justify-between pl-5 pr-5">
             {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <img src={logo.src} className="max-h-8" alt={logo.alt} />
-            </a>
+            </div>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
@@ -182,9 +149,9 @@ const Navbar1 = ({
               <SheetContent className="overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle>
-                    <a href={logo.url} className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <img src={logo.src} className="max-h-8" alt={logo.alt} />
-                    </a>
+                    </div>
                   </SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col gap-6 p-4">
