@@ -1,6 +1,6 @@
 import { LoginForm } from "@/components/login-form";
 
-export default function Login() {
+const LoginPage = () => {
   return (
     <div
       className="flex items-center justify-center"
@@ -11,4 +11,6 @@ export default function Login() {
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;
