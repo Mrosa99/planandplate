@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import MealsMarquee from "@/components/ui/marquee";
 
 const Home = () => {
   return (
@@ -19,6 +20,10 @@ const Home = () => {
             </Button>
           </div>
         </div>
+      </section>
+      <section>
+        <MealsMarquee direction="left" />
+        <MealsMarquee direction="right" />
       </section>
     </div>
   );
