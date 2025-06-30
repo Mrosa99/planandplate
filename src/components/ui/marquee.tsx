@@ -6,7 +6,7 @@ interface MarqueeProps {
   direction?: "left" | "right";
 }
 const App = ({ direction }: MarqueeProps) => (
-  <div className="py-1">
+  <div>
     <Marquee
       pauseOnHover
       direction={direction}
