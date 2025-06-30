@@ -1,6 +1,6 @@
 import React from "react";
 import Marquee from "react-fast-marquee";
-import MediaCard from "./card";
+import MediaCard from "./media-card";
 
 interface MarqueeProps {
   direction?: "left" | "right";
