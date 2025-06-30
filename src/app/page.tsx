@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <div>
       <section>
-        <div className="mx-auto grid grid-cols-1 text-white py-32 sm:px-10 md:px-20 lg:px-40">
+        <div className="mx-auto grid grid-cols-1 text-white py-44 sm:px-10 md:px-20 lg:px-40">
           <h2 className="text-4xl font-bold text-center mb-8">
             Discover Delicious Meals and Plan Meals Easily
           </h2>

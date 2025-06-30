@@ -7,7 +7,10 @@ import CardMedia from "@mui/material/CardMedia";
 
 export default function MediaCard() {
   return (
-    <Card sx={{ maxWidth: 345, maxHeight: 340 }}>
+    <Card
+      className="border-2 border-gray-500 m-4"
+      sx={{ maxWidth: 345, maxHeight: 340 }}
+    >
       <CardActionArea onClick={() => (window.location.href = "/test")}>
         <CardMedia
           component="img"
