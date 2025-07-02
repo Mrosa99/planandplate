@@ -1,11 +1,13 @@
+import FeatureSection from "@/components/feature-section";
 import { Button } from "@/components/ui/button";
 import MealsMarquee from "@/components/ui/marquee";
+import MediaCard from "@/components/ui/media-card";
 
 const Home = () => {
   return (
     <div>
-      <section>
-        <div className="mx-auto grid grid-cols-1 text-white py-44 sm:px-10 md:px-20 lg:px-40">
+      <section className="h-[580px] flex justify-center items-center">
+        <div className="mx-auto grid grid-cols-1 text-white sm:px-10 md:px-20 lg:px-40">
           <h2 className="text-4xl font-bold text-center mb-8">
             Discover Delicious Meals and Plan Meals Easily
           </h2>
@@ -25,6 +27,11 @@ const Home = () => {
         <MealsMarquee direction="left" />
         <MealsMarquee direction="right" />
       </section>
+      <FeatureSection />
+      <section>
+        <div className="w-full h-[580px] bg-gray-100 flex justify-center items-center"></div>
+      </section>
+      <FeatureSection reverse />
     </div>
   );
 };
