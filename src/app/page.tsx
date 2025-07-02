@@ -1,7 +1,6 @@
 import FeatureSection from "@/components/feature-section";
 import { Button } from "@/components/ui/button";
 import MealsMarquee from "@/components/ui/marquee";
-import MediaCard from "@/components/ui/media-card";
 
 const Home = () => {
   return (
@@ -29,7 +28,39 @@ const Home = () => {
       </section>
       <FeatureSection />
       <section>
-        <div className="w-full h-[580px] bg-gray-100 flex justify-center items-center"></div>
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto text-center ">
+            <h2 className="text-2xl font-bold mb-8">
+              How Plan and Plate Works
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1">
+                <h3 className="text-xl font-semibold mb-2">
+                  1. Add Your Ingredients
+                </h3>
+                <p className="step-desc">
+                  Start with what’s in your fridge or pantry.
+                </p>
+              </div>
+              <div className="transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1">
+                <h3 className="text-xl font-semibold mb-2">
+                  2. Get Recipes Instantly
+                </h3>
+                <p className="step-desc">
+                  We'll suggest meals you can cook right now.
+                </p>
+              </div>
+              <div className="transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1">
+                <h3 className="text-xl font-semibold mb-2">
+                  3. Plan Your Week
+                </h3>
+                <p className="step-desc">
+                  Drag and drop recipes into your custom meal plan.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
       <FeatureSection reverse />
     </div>
