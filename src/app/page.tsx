@@ -1,4 +1,5 @@
 import FeatureSection from "@/components/feature-section";
+import Footer from "@/components/footer-section";
 import { Button } from "@/components/ui/button";
 import MealsMarquee from "@/components/ui/marquee";
 
@@ -61,8 +62,22 @@ const Home = () => {
             </div>
           </div>
         </section>
+        <FeatureSection reverse />
       </section>
-      <FeatureSection reverse />
+      <section className="relative h-[440px] flex flex-col justify-end overflow-hidden">
+        <svg
+          className="absolute top-0 left-0 w-full h-[100px] rotate-180 text-primary"
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+        >
+          <path d="M0,160L40,149.3C80,139,160,117,240,90.7C320,64,400,32,480,42.7C560,53,640,107,720,144C800,181,880,203,960,186.7C1040,171,1120,117,1200,96C1280,75,1360,85,1400,90.7L1440,96L1440,0L1400,0C1360,0,1280,0,1200,0C1120,0,1040,0,960,0C880,0,800,0,720,0C640,0,560,0,480,0C400,0,320,0,240,0C160,0,80,0,40,0L0,0Z" />
+        </svg>
+        <div className="w-full h-[350px] bg-primary overflow-y-auto z-10 relative flex items-center justify-center">
+          <Footer />
+        </div>
+      </section>
     </div>
   );
 };
