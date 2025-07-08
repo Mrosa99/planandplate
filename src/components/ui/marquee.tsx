@@ -19,6 +19,9 @@ const App = ({ direction }: MarqueeProps) => (
       <MediaCard />
       <MediaCard />
       <MediaCard />
+      <MediaCard />
+      <MediaCard />
+      <MediaCard />
     </Marquee>
   </div>
 );
