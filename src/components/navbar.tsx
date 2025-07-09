@@ -134,7 +134,7 @@ const Navbar1 = ({
         </nav>
 
         {/* Mobile Menu */}
-        <div className="block lg:hidden justify-between w-full">
+        <div className="block lg:hidden justify-between w-full ">
           <div className="flex items-center justify-between pl-5 pr-5">
             {/* Logo */}
             <div className="flex items-center gap-2">

@@ -23,7 +23,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      <section>
+      <section className="overflow-x-hidden w-full">
         <MealsMarquee direction="left" />
         <MealsMarquee direction="right" />
       </section>
