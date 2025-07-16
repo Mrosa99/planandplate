@@ -20,7 +20,7 @@ export function ForgotPasswordForm({
         <CardHeader>
           <CardTitle>Enter the email for your account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your email below to reset your password
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -35,21 +35,9 @@ export function ForgotPasswordForm({
                   required
                 />
               </div>
-              <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
-                  Login
+                  Send Reset Link
                 </Button>
               </div>
             </div>
@@ -57,6 +45,12 @@ export function ForgotPasswordForm({
               Don&apos;t have an account?{" "}
               <a href="/auth/signup" className="underline underline-offset-4">
                 Sign up
+              </a>
+            </div>
+            <div className="mt-2 text-center text-sm">
+              Back to{" "}
+              <a href="/auth/login" className="underline underline-offset-4">
+                Login
               </a>
             </div>
           </form>

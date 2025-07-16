@@ -112,6 +112,10 @@
   --sidebar-ring: oklch(0.541 0.281 293.009);
 }
 
+.step-desc {
+  @apply text-gray-400 border-b-2 border-primary pb-2;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
