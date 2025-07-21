@@ -1,6 +1,12 @@
-export async function fetchMeals() {
+export interface Meal {
+  idMeal: string;
+  strMeal: string;
+  strMealThumb: string;
+}
+
+export async function fetchMealsByLetter(letter: string): Promise<Meal[]> {
   const res = await fetch(
-    "https://www.themealdb.com/api/json/v1/1/search.php?f=a",
+    `https://www.themealdb.com/api/json/v1/1/search.php?f=${letter}`,
     { cache: "no-store" }
   );
 
@@ -9,5 +15,5 @@ export async function fetchMeals() {
   }
 
   const data = await res.json();
-  return data.meals;
+  return data.meals ?? [];
 }

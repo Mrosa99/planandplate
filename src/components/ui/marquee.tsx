@@ -1,17 +1,19 @@
+"use client";
+
 import React from "react";
 import Marquee from "react-fast-marquee";
 import MediaCard from "./media-card";
-import { fetchMeals } from "@/lib/fetch-meals";
+import type { Meal } from "@/lib/fetch-meals";
 
 interface MarqueeProps {
+  meals: Meal[];
   direction?: "left" | "right";
 }
 
-export default async function MealsMarquee({
+export default function MealsMarquee({
+  meals,
   direction = "left",
 }: MarqueeProps) {
-  const meals = await fetchMeals();
-
   return (
     <div>
       <Marquee

@@ -17,7 +17,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ image, title }) => {
         className="border-2 border-gray-500 m-4"
         sx={{ maxWidth: 345, maxHeight: 340 }}
       >
-        <CardActionArea onClick={() => (window.location.href = "/test")}>
+        <CardActionArea onClick={() => (window.location.href = `/${title}`)}>
           <CardMedia
             component="img"
             height="340"
