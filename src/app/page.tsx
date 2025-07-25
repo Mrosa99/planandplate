@@ -31,7 +31,7 @@ export default async function Home() {
         <MealsMarquee meals={mealsB} direction="left" />
         <MealsMarquee meals={mealsC} direction="right" />
       </section>
-      <FeatureSection />
+      <FeatureSection meals={mealsC} />
       <section>
         <section className="py-20">
           <div className="max-w-7xl mx-auto text-center ">
@@ -66,7 +66,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <FeatureSection reverse />
+        <FeatureSection meals={mealsB} reverse />
       </section>
       <section className="relative h-[440px] flex flex-col justify-end overflow-hidden">
         <svg

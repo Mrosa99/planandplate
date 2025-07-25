@@ -1,12 +1,19 @@
 import MediaCard from "./ui/media-card";
+import type { Meal } from "@/lib/fetch-meals";
 
 interface FeatureSectionProps {
+  meals: Meal[];
   reverse?: boolean;
 }
 
-const FeatureSection = ({ reverse = false }: FeatureSectionProps) => {
+const FeatureSection = ({ meals, reverse = false }: FeatureSectionProps) => {
+  if (!meals || meals.length === 0) return null;
+  const randomMeal = meals[Math.floor(Math.random() * meals.length)];
+  const shuffledMeals = [...meals].sort(() => 0.5 - Math.random());
+  const topThreeMeals = shuffledMeals.slice(0, 3);
+
   const content = (
-    <div className="text-left w-[600px]">
+    <div className="text-left mx-auto py-5">
       <div className="border-l-2 border-gray-300 pl-4 mb-8">
         <h2 className="text-xl lg:text-3xl font-bold mb-4">
           Ingredient Based Recipes
@@ -35,21 +42,52 @@ const FeatureSection = ({ reverse = false }: FeatureSectionProps) => {
       <div className="w-full grid grid-cols-2 h-full">
         {reverse ? (
           <>
-            <div className="flex items-center justify-center h-full">
-              {content}
-            </div>
-            <div className="flex justify-center items-center h-full">
-              <MediaCard />
+            <div className="feature-content">{content}</div>
+            <div className="feature-img">
+              {/* Desktop: show 1 image */}
+              <div className="hidden md:block">
+                <MediaCard
+                  image={randomMeal.strMealThumb}
+                  title={randomMeal.strMeal}
+                />
+              </div>
+
+              {/* Mobile: show 3 stacked images */}
+              <div className="flex flex-col gap-4 md:hidden">
+                {topThreeMeals.map((meal) => (
+                  <MediaCard
+                    key={meal.idMeal}
+                    image={meal.strMealThumb}
+                    title={meal.strMeal}
+                  />
+                ))}
+              </div>
             </div>
           </>
         ) : (
           <>
-            <div className="flex justify-center items-center h-full">
-              <MediaCard />
+            <div className="feature-img">
+              {/* Desktop: show 1 image */}
+              <div className="hidden md:block">
+                <MediaCard
+                  image={randomMeal.strMealThumb}
+                  title={randomMeal.strMeal}
+                />
+              </div>
+
+              {/* Mobile: show 3 stacked images */}
+              <div className="flex flex-col gap-4 md:hidden">
+                {topThreeMeals.map((meal) => (
+                  <MediaCard
+                    key={meal.idMeal}
+                    image={meal.strMealThumb}
+                    title={meal.strMeal}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="flex items-center justify-center h-full">
-              {content}
-            </div>
+
+            <div className="feature-content">{content}</div>
           </>
         )}
       </div>
