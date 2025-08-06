@@ -1,29 +1,36 @@
+"use client";
+
 import React from "react";
 import Marquee from "react-fast-marquee";
 import MediaCard from "./media-card";
+import type { Meal } from "@/lib/fetch-meals";
 
 interface MarqueeProps {
+  meals: Meal[];
   direction?: "left" | "right";
 }
-const App = ({ direction }: MarqueeProps) => (
-  <div>
-    <Marquee
-      pauseOnHover
-      direction={direction}
-      gradient={true}
-      gradientColor="rgb(23, 23, 23)"
-      gradientWidth={75}
-    >
-      <MediaCard />
-      <MediaCard />
-      <MediaCard />
-      <MediaCard />
-      <MediaCard />
-      <MediaCard />
-      <MediaCard />
-      <MediaCard />
-    </Marquee>
-  </div>
-);
 
-export default App;
+export default function MealsMarquee({
+  meals,
+  direction = "left",
+}: MarqueeProps) {
+  return (
+    <div>
+      <Marquee
+        pauseOnHover
+        direction={direction}
+        gradient={true}
+        gradientColor="rgb(23, 23, 23)"
+        gradientWidth={75}
+      >
+        {meals.map((meal: any) => (
+          <MediaCard
+            key={meal.idMeal}
+            image={meal.strMealThumb}
+            title={meal.strMeal}
+          />
+        ))}
+      </Marquee>
+    </div>
+  );
+}
