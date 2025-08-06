@@ -1,7 +1,8 @@
+import { MealsList } from "@/components/recipe-list";
 import { fetchMealsByLetter } from "@/lib/fetch-meals";
 
 export default async function ProductsPage() {
-  const products = await fetchMealsByLetter("b");
+  const meals = await fetchMealsByLetter("b");
 
   return (
     <div className="pb-8">
@@ -9,7 +10,7 @@ export default async function ProductsPage() {
         All Products
       </h1>
       TEST
-      {/* <ProductList products={products} /> */}
+      <MealsList meals={meals} />
     </div>
   );
 }

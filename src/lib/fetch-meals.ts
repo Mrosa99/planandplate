@@ -2,6 +2,7 @@ export interface Meal {
   idMeal: string;
   strMeal: string;
   strMealThumb: string;
+  strInstructions: string | null;
 }
 
 export async function fetchMealsByLetter(letter: string): Promise<Meal[]> {
