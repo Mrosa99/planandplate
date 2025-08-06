@@ -63,6 +63,12 @@ const Navbar1 = ({
       url: "#",
       items: [
         {
+          title: "All Recipes",
+          description: "All Recipes",
+          icon: <Book className="size-5 shrink-0" />,
+          url: "/recipes",
+        },
+        {
           title: "Trending",
           description: "Recipes that are getting the most attention right now.",
           icon: <Book className="size-5 shrink-0" />,
