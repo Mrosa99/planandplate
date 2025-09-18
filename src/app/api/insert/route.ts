@@ -48,26 +48,20 @@ export async function POST(req: NextRequest) {
     const key = req.headers.get("x-api-key") || body.key;
 
     // Fetch meals in parallel
+
     const results: Meal[][] = await Promise.all(letters.map(fetchMeals));
+
     const allMeals: Meal[] = results.flat();
 
-    if (allMeals.length === 0) {
-      return NextResponse.json({ success: false, message: "No meals found" });
-    }
-
-    // Upsert into Supabase (using onConflict or ignoreDuplicates)
     const { data, error } = (await supabase.from("meals").upsert(allMeals, {
       onConflict: "external_id",
     })) as { data: Meal[] | null; error: any };
 
-    if (error) throw error;
-
     return NextResponse.json({
       success: true,
-      inserted: data?.length ?? 0,
+      inserted: data ? data.length : 0,
     });
   } catch (err: any) {
-    console.error("Error importing meals:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
