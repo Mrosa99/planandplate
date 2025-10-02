@@ -1,3 +1,5 @@
+"use client";
+
 import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
 
 import {
@@ -186,7 +188,7 @@ const renderMenuItem = (item: MenuItem) => {
     return (
       <NavigationMenuItem key={item.title}>
         <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground">
+        <NavigationMenuContent className="bg-popover text-popover-foreground min-w-[300px] w-80">
           {item.items.map((subItem) => (
             <NavigationMenuLink asChild key={subItem.title} className="w-80">
               <SubMenuLink item={subItem} />
