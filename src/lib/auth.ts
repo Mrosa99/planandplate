@@ -7,7 +7,6 @@ export async function login(email: string, password: string) {
   });
 
   if (error) {
-    console.log("Login error:", error);
     throw new Error(error.message ?? "Login failed");
   }
 

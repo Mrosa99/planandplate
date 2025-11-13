@@ -36,11 +36,10 @@ export function LoginForm({
 
     try {
       const data = await login(email, password);
-      console.log("Login success:", data);
 
       // Example: redirect on success (Next.js App Router)
       if (nextRouter) {
-        nextRouter.push("/dashboard"); // change to your route
+        nextRouter.push("/");
         return;
       }
 
