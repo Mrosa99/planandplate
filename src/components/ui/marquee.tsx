@@ -3,7 +3,7 @@
 import React from "react";
 import Marquee from "react-fast-marquee";
 import MediaCard from "./media-card";
-import type { Meal } from "@/lib/fetch-meals";
+import type { Meal } from "@/lib/supabase/fetch-meals";
 
 interface MarqueeProps {
   meals: Meal[];

@@ -2,7 +2,7 @@ import FeatureSection from "@/components/feature-section";
 import Footer from "@/components/footer-section";
 import { Button } from "@/components/ui/button";
 import MealsMarquee from "@/components/ui/marquee";
-import { fetchMealsByLetter } from "@/lib/fetch-meals";
+import { fetchMealsByLetter } from "@/lib/supabase/fetch-meals";
 
 export default async function Home() {
   const mealsB = await fetchMealsByLetter("b");
