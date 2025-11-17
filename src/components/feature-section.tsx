@@ -1,5 +1,5 @@
 import MediaCard from "./ui/media-card";
-import type { Meal } from "@/lib/fetch-meals";
+import type { Meal } from "@/lib/supabase/fetch-meals";
 
 interface FeatureSectionProps {
   meals: Meal[];
