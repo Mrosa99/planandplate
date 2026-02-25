@@ -1,101 +1,125 @@
-import FeatureSection from "@/components/feature-section";
-import Footer from "@/components/footer-section";
-import { Button } from "@/components/ui/button";
-import MealsMarquee from "@/components/ui/marquee";
-import { fetchAllMeals } from "@/lib/supabase/fetch-meals";
+// app/page.tsx
+import Image from "next/image";
 
-export default async function Home() {
-  const meals = await fetchAllMeals();
-
-  // const mealsB = await fetchMealsByLetter("b");
-  // const mealsC = await fetchMealsByLetter("c");
-
+export default function HomePage() {
   return (
-    <div>
-      <h1>Meals</h1>
-      {meals.map((meal) => (
-        <div key={meal.id_meal}>
-          <p>ID: {meal.id_meal}</p>
-          <p>Name: {meal.name}</p>
-          <p>Image: {meal.image_url}</p>
-          <br />
+    <main className="min-h-screen bg-gradient-to-br  flex flex-col items-center justify-start p-6">
+      {/* Header */}
+      <header className="w-full max-w-6xl flex flex-col sm:flex-row items-center justify-between py-8">
+        <h1 className="text-4xl sm:text-5xl font-bold ">Plan & Plate</h1>
+        <nav className="mt-4 sm:mt-0 flex gap-6  font-medium">
+          <a href="#about" className="hover:underline">
+            About
+          </a>
+          <a href="#meals" className="hover:underline">
+            Meals
+          </a>
+          <a href="#contact" className="hover:underline">
+            Contact
+          </a>
+        </nav>
+      </header>
+
+      {/* Hero Section */}
+      <section className="w-full max-w-6xl flex flex-col-reverse sm:flex-row items-center gap-8 sm:gap-16 py-12">
+        <div className="flex-1 space-y-6">
+          <h2 className="text-3xl sm:text-4xl font-semibold ">
+            Discover Delicious Meals Every Day
+          </h2>
+          <p className="text-gray-700 text-lg sm:text-xl">
+            Explore hundreds of meals, find inspiration for your next dish, and
+            manage your favorites all in one place.
+          </p>
+          <div className="flex gap-4">
+            <a
+              href="/api/insert"
+              className="px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg shadow hover:bg-orange-700 transition"
+            >
+              Fetch Meals
+            </a>
+            <a
+              href="/meals"
+              className="px-6 py-3 border border-orange-600 text-orange-600 font-semibold rounded-lg hover:bg-orange-50 transition"
+            >
+              Browse Meals
+            </a>
+          </div>
         </div>
-      ))}
-    </div>
+        <div className="flex-1 relative w-full h-64 sm:h-96">
+          <Image
+            src="/hero-meal.jpg" // replace with your image
+            alt="Delicious meal"
+            fill
+            className="object-cover rounded-2xl shadow-lg"
+          />
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="w-full max-w-6xl py-16">
+        <h3 className="text-2xl font-semibold text-orange-600 mb-6">
+          About Plan & Plate
+        </h3>
+        <p className="text-gray-700 text-lg sm:text-xl leading-relaxed">
+          Plan & Plate is a simple platform to help you explore meals, discover
+          new recipes, and manage your favorites. Whether you’re cooking for
+          yourself or your family, we provide inspiration for every occasion.
+        </p>
+      </section>
+
+      {/* Features / Highlights */}
+      <section
+        id="meals"
+        className="w-full max-w-6xl py-16 grid grid-cols-1 sm:grid-cols-3 gap-8"
+      >
+        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
+          <Image
+            src="/icon-search.svg"
+            alt="Search meals"
+            width={64}
+            height={64}
+          />
+          <h4 className="mt-4 text-xl font-semibold text-orange-700">
+            Discover
+          </h4>
+          <p className="mt-2 text-gray-600">
+            Search meals by name, category, or first letter.
+          </p>
+        </div>
+        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
+          <Image
+            src="/icon-heart.svg"
+            alt="Save meals"
+            width={64}
+            height={64}
+          />
+          <h4 className="mt-4 text-xl font-semibold text-orange-700">
+            Favorites
+          </h4>
+          <p className="mt-2 text-gray-600">
+            Save your favorite meals and quickly access them anytime.
+          </p>
+        </div>
+        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
+          <Image
+            src="/icon-upload.svg"
+            alt="Upload meals"
+            width={64}
+            height={64}
+          />
+          <h4 className="mt-4 text-xl font-semibold text-orange-700">
+            Add Your Own
+          </h4>
+          <p className="mt-2 text-gray-600">
+            Easily add new meals and contribute to the database.
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="w-full max-w-6xl py-8 text-center text-gray-500 text-sm border-t border-gray-200">
+        &copy; {new Date().getFullYear()} Plan & Plate. All rights reserved.
+      </footer>
+    </main>
   );
-  //   <div>
-  //     <section className="h-[580px] flex justify-center items-center">
-  //       <div className="mx-auto grid grid-cols-1 text-white sm:px-10 md:px-20 lg:px-40">
-  //         <h2 className="text-4xl font-bold text-center mb-8">
-  //           Discover Delicious Meals and Plan Meals Easily
-  //         </h2>
-  //         <p className="text-center sm:text-lg lg:text-xl mb-8">
-  //           Plan and Plate helps you discover new recipes, plan your meals, and
-  //           make the most of the ingredients you already have.
-  //         </p>
-  //         <div className=" flex justify-center mt-4 space-x-4">
-  //           <Button className="px-10">Get Started</Button>
-  //           <Button className="px-10 border-3" variant="ghost">
-  //             Top Recipes
-  //           </Button>
-  //         </div>
-  //       </div>
-  //     </section>
-  //     <section>
-  //       {/* <MealsMarquee meals={meals} direction="left" /> */}
-  //       {/* <MealsMarquee meals={mealsC} direction="right" /> */}
-  //     </section>
-  //     {/* <FeatureSection meals={mealsC} /> */}
-  //     <section>
-  //       <section className="py-20">
-  //         <div className="max-w-7xl mx-auto text-center ">
-  //           <h2 className="text-2xl font-bold mb-8">
-  //             How Plan and Plate Works
-  //           </h2>
-  //           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-  //             <div className="transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1">
-  //               <h3 className="text-xl font-semibold mb-2">
-  //                 1. Add Your Ingredients
-  //               </h3>
-  //               <p className="step-desc">
-  //                 Start with what’s in your fridge or pantry.
-  //               </p>
-  //             </div>
-  //             <div className="transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1">
-  //               <h3 className="text-xl font-semibold mb-2">
-  //                 2. Get Recipes Instantly
-  //               </h3>
-  //               <p className="step-desc">
-  //                 We'll suggest meals you can cook right now.
-  //               </p>
-  //             </div>
-  //             <div className="transition-transform duration-300 ease-out hover:scale-105 hover:-translate-y-1">
-  //               <h3 className="text-xl font-semibold mb-2">
-  //                 3. Plan Your Week
-  //               </h3>
-  //               <p className="step-desc">
-  //                 Drag and drop recipes into your custom meal plan.
-  //               </p>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       </section>
-  //       {/* <FeatureSection meals={mealsB} reverse /> */}
-  //     </section>
-  //     <section className="relative h-[440px] flex flex-col justify-end overflow-hidden">
-  //       <svg
-  //         className="absolute top-0 left-0 w-full h-[100px] rotate-180 text-primary"
-  //         viewBox="0 0 1440 320"
-  //         preserveAspectRatio="none"
-  //         xmlns="http://www.w3.org/2000/svg"
-  //         fill="currentColor"
-  //       >
-  //         <path d="M0,160L40,149.3C80,139,160,117,240,90.7C320,64,400,32,480,42.7C560,53,640,107,720,144C800,181,880,203,960,186.7C1040,171,1120,117,1200,96C1280,75,1360,85,1400,90.7L1440,96L1440,0L1400,0C1360,0,1280,0,1200,0C1120,0,1040,0,960,0C880,0,800,0,720,0C640,0,560,0,480,0C400,0,320,0,240,0C160,0,80,0,40,0L0,0Z" />
-  //       </svg>
-  //       <div className="w-full h-[345px] bg-primary overflow-y-auto z-10 relative flex items-center justify-center">
-  //         <Footer />
-  //       </div>
-  //     </section>
-  //   </div>
-  // );
 }

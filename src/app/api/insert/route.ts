@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 // Initialize Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
 const letters = "abcdefghijklmnopqrstuvwxyz".split("");
@@ -22,12 +22,12 @@ async function fetchMeals(letter: string): Promise<Meal[]> {
       `https://www.themealdb.com/api/json/v1/1/search.php?f=${letter}`,
       {
         cache: "no-store",
-      }
+      },
     );
 
     if (!res.ok) {
       console.error(
-        `Failed to fetch meals for letter ${letter}. Status: ${res.status}`
+        `Failed to fetch meals for letter ${letter}. Status: ${res.status}`,
       );
       return [];
     }
@@ -47,13 +47,12 @@ async function fetchMeals(letter: string): Promise<Meal[]> {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const key = req.headers.get("x-api-key") || body.key;
+    const key = req.headers.get("x-api-key");
 
     if (key !== process.env.MEAL_IMPORT_SECRET) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -77,7 +76,7 @@ export async function POST(req: NextRequest) {
     if (error) {
       return NextResponse.json(
         { success: false, error: error.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -89,7 +88,7 @@ export async function POST(req: NextRequest) {
     console.error("Unexpected error inserting meals:", err);
     return NextResponse.json(
       { success: false, error: err.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
