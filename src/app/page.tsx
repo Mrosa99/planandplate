@@ -6,24 +6,15 @@ export default function HomePage() {
     <main className="min-h-screen bg-gradient-to-br  flex flex-col items-center justify-start p-6">
       {/* Header */}
       <header className="w-full max-w-6xl flex flex-col sm:flex-row items-center justify-between py-8">
-        <h1 className="text-4xl sm:text-5xl font-bold ">Plan & Plate</h1>
-        <nav className="mt-4 sm:mt-0 flex gap-6  font-medium">
-          <a href="#about" className="hover:underline">
-            About
-          </a>
-          <a href="#meals" className="hover:underline">
-            Meals
-          </a>
-          <a href="#contact" className="hover:underline">
-            Contact
-          </a>
-        </nav>
+        <h1 className="text-4xl sm:text-5xl font-bold text-primary">
+          Plan & Plate
+        </h1>
       </header>
 
       {/* Hero Section */}
       <section className="w-full max-w-6xl flex flex-col-reverse sm:flex-row items-center gap-8 sm:gap-16 py-12">
         <div className="flex-1 space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-semibold ">
+          <h2 className="text-3xl sm:text-4xl font-semibold text-orange-700">
             Discover Delicious Meals Every Day
           </h2>
           <p className="text-gray-700 text-lg sm:text-xl">
@@ -32,14 +23,14 @@ export default function HomePage() {
           </p>
           <div className="flex gap-4">
             <a
-              href="/api/insert"
-              className="px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg shadow hover:bg-orange-700 transition"
+              href="/"
+              className="px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-orange-700 transition"
             >
               Fetch Meals
             </a>
             <a
-              href="/meals"
-              className="px-6 py-3 border border-orange-600 text-orange-600 font-semibold rounded-lg hover:bg-orange-50 transition"
+              href="/"
+              className="px-6 py-3 border border-primary text-primary font-semibold rounded-lg hover:bg-orange-50 transition"
             >
               Browse Meals
             </a>
@@ -57,7 +48,7 @@ export default function HomePage() {
 
       {/* About Section */}
       <section id="about" className="w-full max-w-6xl py-16">
-        <h3 className="text-2xl font-semibold text-orange-600 mb-6">
+        <h3 className="text-2xl font-semibold text-primary mb-6">
           About Plan & Plate
         </h3>
         <p className="text-gray-700 text-lg sm:text-xl leading-relaxed">
