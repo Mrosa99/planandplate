@@ -1,7 +1,18 @@
 // app/page.tsx
 import Image from "next/image";
+import { fetchRandomMeal } from "../lib/supabase/fetch-meals";
+import { MealData } from "../lib/supabase/fetch-meals";
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch a random meal on the server
+  let meal: MealData | null = null;
+  try {
+    meal = await fetchRandomMeal();
+    console.log("Random meal fetched:", meal);
+  } catch (err) {
+    console.error("Error fetching random meal:", err);
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br  flex flex-col items-center justify-start p-6">
       {/* Header */}
@@ -37,12 +48,18 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex-1 relative w-full h-64 sm:h-96">
-          <Image
-            src="/hero-meal.jpg" // replace with your image
-            alt="Delicious meal"
-            fill
-            className="object-cover rounded-2xl shadow-lg"
-          />
+          {meal ? (
+            <Image
+              src={meal.image_url}
+              alt={meal.name}
+              fill
+              className="object-cover rounded-lg shadow-lg"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
+              Loading...
+            </div>
+          )}
         </div>
       </section>
 
