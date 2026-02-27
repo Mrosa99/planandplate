@@ -1,14 +1,13 @@
 // app/page.tsx
 import Image from "next/image";
-import { fetchRandomMeal } from "../lib/supabase/fetch-meals";
+import { fetchRandomMeals } from "../lib/supabase/fetch-meals";
 import { MealData } from "../lib/supabase/fetch-meals";
 
 export default async function HomePage() {
   // Fetch a random meal on the server
-  let meal: MealData | null = null;
+  let MealData: MealData[] = [];
   try {
-    meal = await fetchRandomMeal();
-    console.log("Random meal fetched:", meal);
+    MealData = await fetchRandomMeals(4);
   } catch (err) {
     console.error("Error fetching random meal:", err);
   }
@@ -48,10 +47,10 @@ export default async function HomePage() {
           </div>
         </div>
         <div className="flex-1 relative w-full h-64 sm:h-96">
-          {meal ? (
+          {MealData ? (
             <Image
-              src={meal.image_url}
-              alt={meal.name}
+              src={MealData[0].image_url}
+              alt={MealData[0].name}
               fill
               className="object-cover rounded-lg shadow-lg"
             />
@@ -81,12 +80,18 @@ export default async function HomePage() {
         className="w-full max-w-6xl py-16 grid grid-cols-1 sm:grid-cols-3 gap-8"
       >
         <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
-          <Image
-            src="/icon-search.svg"
-            alt="Search meals"
-            width={64}
-            height={64}
-          />
+          {MealData ? (
+            <Image
+              src={MealData[1].image_url}
+              alt={MealData[1].name}
+              width={64}
+              height={64}
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
+              Loading...
+            </div>
+          )}
           <h4 className="mt-4 text-xl font-semibold text-orange-700">
             Discover
           </h4>
@@ -95,12 +100,18 @@ export default async function HomePage() {
           </p>
         </div>
         <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
-          <Image
-            src="/icon-heart.svg"
-            alt="Save meals"
-            width={64}
-            height={64}
-          />
+          {MealData ? (
+            <Image
+              src={MealData[2].image_url}
+              alt={MealData[2].name}
+              width={64}
+              height={64}
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
+              Loading...
+            </div>
+          )}
           <h4 className="mt-4 text-xl font-semibold text-orange-700">
             Favorites
           </h4>
@@ -109,12 +120,18 @@ export default async function HomePage() {
           </p>
         </div>
         <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
-          <Image
-            src="/icon-upload.svg"
-            alt="Upload meals"
-            width={64}
-            height={64}
-          />
+          {MealData ? (
+            <Image
+              src={MealData[3].image_url}
+              alt={MealData[3].name}
+              width={64}
+              height={64}
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
+              Loading...
+            </div>
+          )}
           <h4 className="mt-4 text-xl font-semibold text-orange-700">
             Add Your Own
           </h4>

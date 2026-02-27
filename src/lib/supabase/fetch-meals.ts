@@ -16,32 +16,25 @@ export async function fetchAllMeals(): Promise<MealData[]> {
   return (data ?? []) as MealData[];
 }
 
-export async function fetchRandomMeal(): Promise<MealData | null> {
-  // 1️⃣ Fetch all IDs
+export async function fetchRandomMeals(count: number): Promise<MealData[]> {
   const { data: ids, error: idError } = await supabase
     .from("meals")
     .select("id_meal");
 
-  if (idError) {
-    throw new Error(idError.message ?? "Failed to fetch meal IDs");
-  }
+  if (idError) throw new Error(idError.message);
 
-  if (!ids || ids.length === 0) return null;
+  if (!ids || ids.length === 0) return [];
 
-  // 2️⃣ Pick a random ID in JS
-  const randomIndex = Math.floor(Math.random() * ids.length);
-  const randomId = ids[randomIndex].id_meal;
+  // shuffle IDs and pick `count`
+  const shuffled = ids.sort(() => 0.5 - Math.random()).slice(0, count);
+  const mealIds = shuffled.map((m) => m.id_meal);
 
-  // 3️⃣ Fetch the full meal
-  const { data: meal, error } = await supabase
+  const { data, error } = await supabase
     .from("meals")
     .select("*")
-    .eq("id_meal", randomId)
-    .single();
+    .in("id_meal", mealIds);
 
-  if (error) {
-    throw new Error(error.message ?? "Failed to fetch random meal");
-  }
+  if (error) throw new Error(error.message);
 
-  return (meal ?? null) as MealData | null;
+  return data ?? [];
 }
