@@ -8,6 +8,7 @@ export default async function HomePage() {
   let MealData: MealData[] = [];
   try {
     MealData = await fetchRandomMeals(4);
+    console.log(MealData);
   } catch (err) {
     console.error("Error fetching random meal:", err);
   }
@@ -46,16 +47,16 @@ export default async function HomePage() {
             </a>
           </div>
         </div>
-        <div className="flex-1 relative w-full h-64 sm:h-96">
+        <div className="flex-1 relative w-full aspect-[4/3] max-h-[500px] group overflow-hidden rounded-lg shadow-lg">
           {MealData ? (
             <Image
               src={MealData[0].image_url}
               alt={MealData[0].name}
               fill
-              className="object-cover rounded-lg shadow-lg"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
               Loading...
             </div>
           )}
@@ -79,64 +80,67 @@ export default async function HomePage() {
         id="meals"
         className="w-full max-w-6xl py-16 grid grid-cols-1 sm:grid-cols-3 gap-8"
       >
-        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
-          {MealData ? (
-            <Image
-              src={MealData[1].image_url}
-              alt={MealData[1].name}
-              width={64}
-              height={64}
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
-              Loading...
+        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
+          {MealData[0] ? (
+            <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
+              <Image
+                src={MealData[1].image_url}
+                alt={MealData[1].name}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
+          ) : (
+            <div className="w-full aspect-square bg-gray-200 animate-pulse rounded-xl mb-6" />
           )}
-          <h4 className="mt-4 text-xl font-semibold text-orange-700">
-            Discover
-          </h4>
-          <p className="mt-2 text-gray-600">
+
+          <h4 className="text-2xl font-semibold text-orange-700">Discover</h4>
+
+          <p className="mt-3 text-gray-600">
             Search meals by name, category, or first letter.
           </p>
         </div>
-        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
-          {MealData ? (
-            <Image
-              src={MealData[2].image_url}
-              alt={MealData[2].name}
-              width={64}
-              height={64}
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
-              Loading...
+        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
+          {MealData[0] ? (
+            <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
+              <Image
+                src={MealData[2].image_url}
+                alt={MealData[2].name}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
+          ) : (
+            <div className="w-full aspect-square bg-gray-200 animate-pulse rounded-xl mb-6" />
           )}
-          <h4 className="mt-4 text-xl font-semibold text-orange-700">
-            Favorites
-          </h4>
-          <p className="mt-2 text-gray-600">
+
+          <h4 className="text-2xl font-semibold text-orange-700">Favorites</h4>
+
+          <p className="mt-3 text-gray-600">
             Save your favorite meals and quickly access them anytime.
           </p>
         </div>
-        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center">
-          {MealData ? (
-            <Image
-              src={MealData[3].image_url}
-              alt={MealData[3].name}
-              width={64}
-              height={64}
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
-              Loading...
+        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
+          {MealData[0] ? (
+            <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
+              <Image
+                src={MealData[3].image_url}
+                alt={MealData[3].name}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
+          ) : (
+            <div className="w-full aspect-square bg-gray-200 animate-pulse rounded-xl mb-6" />
           )}
-          <h4 className="mt-4 text-xl font-semibold text-orange-700">
-            Add Your Own
-          </h4>
-          <p className="mt-2 text-gray-600">
-            Easily add new meals and contribute to the database.
+
+          <h4 className="text-2xl font-semibold text-orange-700">Discover</h4>
+
+          <p className="mt-3 text-gray-600">
+            Search meals by name, category, or first letter.
           </p>
         </div>
       </section>
