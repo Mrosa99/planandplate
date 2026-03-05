@@ -39,3 +39,18 @@ export async function fetchMealsPagination(
 
   return data || [];
 }
+
+export async function fetchMealData(id: string): Promise<MealData | null> {
+  const { data, error } = await supabase
+    .from("meals")
+    .select("*")
+    .eq("id_meal", id)
+    .single();
+
+  if (error) {
+    console.error("Supabase fetchMealDetails error:", error);
+    return null;
+  }
+
+  return data as MealData | null;
+}

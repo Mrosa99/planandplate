@@ -79,7 +79,7 @@ export default async function HomePage() {
         id="meals"
         className="w-full max-w-6xl py-16 grid grid-cols-1 sm:grid-cols-3 gap-8"
       >
-        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
+        <div className="group bg-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
           {MealData[0] ? (
             <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
               <Image
@@ -96,11 +96,11 @@ export default async function HomePage() {
 
           <h4 className="text-2xl font-semibold text-orange-700">Discover</h4>
 
-          <p className="mt-3 text-gray-600">
+          <p className="mt-3 text-white">
             Search meals by name, category, or first letter.
           </p>
         </div>
-        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
+        <div className="group bg-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
           {MealData[0] ? (
             <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
               <Image
@@ -117,11 +117,11 @@ export default async function HomePage() {
 
           <h4 className="text-2xl font-semibold text-orange-700">Favorites</h4>
 
-          <p className="mt-3 text-gray-600">
+          <p className="mt-3 text-white">
             Save your favorite meals and quickly access them anytime.
           </p>
         </div>
-        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
+        <div className="group bg-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
           {MealData[0] ? (
             <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
               <Image
@@ -138,7 +138,7 @@ export default async function HomePage() {
 
           <h4 className="text-2xl font-semibold text-orange-700">Discover</h4>
 
-          <p className="mt-3 text-gray-600">
+          <p className="mt-3 text-white">
             Search meals by name, category, or first letter.
           </p>
         </div>
