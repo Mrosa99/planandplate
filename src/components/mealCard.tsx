@@ -34,11 +34,7 @@ export const MealCard = ({ meals }: Props) => {
         </CardHeader>
 
         {/* Card Content with Button */}
-        <CardContent className="mt-auto p-4 flex justify-end">
-          <Button className="bg-white text-black font-semibold transition-transform duration-200 group-hover:translate-y-[-2px]">
-            View Details
-          </Button>
-        </CardContent>
+        <CardContent className="mt-auto p-4 flex justify-end"></CardContent>
       </Card>
     </Link>
   );
