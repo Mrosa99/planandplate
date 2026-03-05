@@ -1,4 +1,3 @@
-// src/app/recipes/page.tsx
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
@@ -51,7 +50,7 @@ const RecipesPage = () => {
   }, [hasMore, loading]);
 
   return (
-    <main className="min-h-screen bg-gray-900 text-white py-12 px-6 sm:px-12">
+    <main className="min-h-screen text-white py-12 px-6 sm:px-12">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl sm:text-5xl font-extrabold mb-8 text-center">
           All Recipes
