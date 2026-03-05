@@ -1,7 +1,7 @@
 // app/page.tsx
 import Image from "next/image";
-import { fetchRandomMeals } from "../lib/supabase/fetch-meals";
-import { MealData } from "../lib/supabase/fetch-meals";
+import { fetchRandomMeals } from "../lib/supabase/fetchMealsFromSupabase";
+import { MealData } from "../lib/supabase/fetchMealsFromSupabase";
 
 export default async function HomePage() {
   // Fetch a random meal on the server

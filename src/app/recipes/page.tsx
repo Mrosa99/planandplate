@@ -1,4 +1,4 @@
-import { MealData, fetchAllMeals } from "@/lib/supabase/fetch-meals";
+import { MealData, fetchAllMeals } from "@/lib/supabase/fetchMealsFromSupabase";
 import { MealCard } from "@/components/mealCard";
 
 export default async function RecipesPage() {
