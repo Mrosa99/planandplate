@@ -22,3 +22,20 @@ export async function fetchRandomMeals(count: number): Promise<MealData[]> {
 
   return (data ?? []) as MealData[];
 }
+
+export async function fetchMealsPagination(
+  limit = 20,
+  offset = 0,
+): Promise<MealData[]> {
+  const { data, error } = await supabase
+    .from("meals")
+    .select("*")
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    console.error("Supabase fetchMeals error:", error);
+    return [];
+  }
+
+  return data || [];
+}
