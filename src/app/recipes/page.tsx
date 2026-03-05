@@ -1,15 +1,21 @@
-import { MealsList } from "@/components/recipe-list";
-import { fetchMealsByLetter } from "@/lib/fetch-meals";
+import { MealData, fetchAllMeals } from "@/lib/supabase/fetch-meals";
+import { MealCard } from "@/components/mealCard";
 
-export default async function ProductsPage() {
-  const meals = await fetchMealsByLetter("b");
+export default async function RecipesPage() {
+  const meals: MealData[] = await fetchAllMeals();
 
   return (
-    <div className="pb-8">
-      <h1 className="text-3xl font-bold leading-none tracking-tight text-foreground text-center mb-8">
-        All Products
-      </h1>
-      <MealsList meals={meals} />
-    </div>
+    <main className="min-h-screen text-white py-12 px-6 sm:px-12">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl sm:text-5xl font-extrabold mb-8 text-center">
+          All Recipes
+        </h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {meals.map((meal) => (
+            <MealCard key={meal.id_meal} meals={meal} />
+          ))}
+        </div>
+      </div>
+    </main>
   );
 }

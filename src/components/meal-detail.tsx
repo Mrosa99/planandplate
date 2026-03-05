@@ -1,5 +1,5 @@
 import React from "react";
-import { Meal } from "@/lib/fetch-meals";
+import { Meal } from "@/lib/fetchMealsFromApi";
 
 interface Props {
   meal: Meal | null;

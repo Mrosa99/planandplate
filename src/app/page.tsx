@@ -8,7 +8,6 @@ export default async function HomePage() {
   let MealData: MealData[] = [];
   try {
     MealData = await fetchRandomMeals(4);
-    console.log(MealData);
   } catch (err) {
     console.error("Error fetching random meal:", err);
   }

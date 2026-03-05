@@ -29,7 +29,7 @@ export function LoginForm({
     setLoading(true);
 
     const form = e.currentTarget;
-    // use names to read fields
+
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement)
       .value;
@@ -37,15 +37,11 @@ export function LoginForm({
     try {
       const data = await login(email, password);
 
-      // Example: redirect on success (Next.js App Router)
       if (nextRouter) {
         nextRouter.push("/");
         return;
       }
-
-      // Otherwise you can do whatever you need with data (update app state, context, etc.)
     } catch (err: any) {
-      // show friendly message
       setError(err?.message ?? "An unexpected error occurred");
     } finally {
       setLoading(false);

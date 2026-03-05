@@ -12,7 +12,6 @@ export async function fetchAllMeals(): Promise<MealData[]> {
   if (error) {
     throw new Error(error.message ?? "Failed to fetch meals");
   }
-  console.log("Fetched meals:", data);
   return (data ?? []) as MealData[];
 }
 
