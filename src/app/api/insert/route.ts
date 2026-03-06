@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-
 const letters = "abcdefghijklmnopqrstuvwxyz".split("");
 
 interface Meal {
@@ -46,6 +40,10 @@ async function fetchMeals(letter: string): Promise<Meal[]> {
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
   try {
     const key = req.headers.get("x-api-key");
 
