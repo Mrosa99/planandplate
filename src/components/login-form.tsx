@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter as useNextRouter } from "next/navigation"; // optional, only for Next.js app router
 import { cn } from "@/lib/utils";
-import { login } from "@/lib/auth";
+import { login } from "@/lib/supabase/userAuth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
