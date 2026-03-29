@@ -1,6 +1,9 @@
 "use client";
 
 import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase/supabaseClient";
+import { useAuthSession } from "@/lib/supabase/useAuthSession";
 
 import {
   Accordion,
@@ -31,6 +34,7 @@ interface MenuItem {
   description?: string;
   icon?: React.ReactNode;
   items?: MenuItem[];
+  requiresAuth?: boolean;
 }
 
 interface Navbar1Props {
@@ -48,6 +52,9 @@ interface Navbar1Props {
     signup: {
       title: string;
       url: string;
+    };
+    logout?: {
+      title: string;
     };
   };
 }
@@ -99,6 +106,7 @@ const Navbar1 = ({
     {
       title: "Categories",
       url: "/categories",
+      requiresAuth: true,
     },
     {
       title: "Search",
@@ -108,8 +116,22 @@ const Navbar1 = ({
   auth = {
     login: { title: "Login", url: "/auth/login" },
     signup: { title: "Sign up", url: "/auth/signup" },
+    logout: { title: "Logout" },
   },
 }: Navbar1Props) => {
+  const { session, isLoading } = useAuthSession();
+  const router = useRouter();
+  const isAuthenticated = !!session;
+
+  const visibleMenu = menu.filter(
+    (item) => !item.requiresAuth || isAuthenticated
+  );
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
+
   return (
     <section className="sticky top-0 z-50 py-3 bg-background">
       <div className="container mx-auto flex w-full items-center">
@@ -126,18 +148,28 @@ const Navbar1 = ({
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>
-                  {menu.map((item) => renderMenuItem(item))}
+                  {visibleMenu.map((item) => renderMenuItem(item))}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <a href={auth.login.url}>{auth.login.title}</a>
-            </Button>
-            <Button asChild size="sm">
-              <a href={auth.signup.url}>{auth.signup.title}</a>
-            </Button>
+            {!isLoading && (
+              isAuthenticated ? (
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  {auth.logout?.title ?? "Logout"}
+                </Button>
+              ) : (
+                <>
+                  <Button asChild variant="outline" size="sm">
+                    <a href={auth.login.url}>{auth.login.title}</a>
+                  </Button>
+                  <Button asChild size="sm">
+                    <a href={auth.signup.url}>{auth.signup.title}</a>
+                  </Button>
+                </>
+              )
+            )}
           </div>
         </nav>
 
@@ -168,16 +200,26 @@ const Navbar1 = ({
                     collapsible
                     className="flex w-full flex-col gap-4"
                   >
-                    {menu.map((item) => renderMobileMenuItem(item))}
+                    {visibleMenu.map((item) => renderMobileMenuItem(item))}
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <a href={auth.login.url}>{auth.login.title}</a>
-                    </Button>
-                    <Button asChild>
-                      <a href={auth.signup.url}>{auth.signup.title}</a>
-                    </Button>
+                    {!isLoading && (
+                      isAuthenticated ? (
+                        <Button variant="outline" onClick={handleLogout}>
+                          {auth.logout?.title ?? "Logout"}
+                        </Button>
+                      ) : (
+                        <>
+                          <Button asChild variant="outline">
+                            <a href={auth.login.url}>{auth.login.title}</a>
+                          </Button>
+                          <Button asChild>
+                            <a href={auth.signup.url}>{auth.signup.title}</a>
+                          </Button>
+                        </>
+                      )
+                    )}
                   </div>
                 </div>
               </SheetContent>
