@@ -234,12 +234,12 @@ const renderMenuItem = (item: MenuItem) => {
     return (
       <NavigationMenuItem key={item.title}>
         <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground min-w-300px w-80">
-          {item.items.map((subItem) => (
-            <NavigationMenuLink asChild key={subItem.title} className="w-80">
-              <SubMenuLink item={subItem} />
-            </NavigationMenuLink>
-          ))}
+        <NavigationMenuContent className="bg-popover text-popover-foreground">
+          <div className="flex flex-col w-72 p-1">
+            {item.items.map((subItem) => (
+              <SubMenuLink key={subItem.title} item={subItem} />
+            ))}
+          </div>
         </NavigationMenuContent>
       </NavigationMenuItem>
     );
@@ -265,9 +265,11 @@ const renderMobileMenuItem = (item: MenuItem) => {
           {item.title}
         </AccordionTrigger>
         <AccordionContent className="mt-2">
-          {item.items.map((subItem) => (
-            <SubMenuLink key={subItem.title} item={subItem} />
-          ))}
+          <div className="flex flex-col">
+            {item.items.map((subItem) => (
+              <SubMenuLink key={subItem.title} item={subItem} />
+            ))}
+          </div>
         </AccordionContent>
       </AccordionItem>
     );
