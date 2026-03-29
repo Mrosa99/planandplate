@@ -124,7 +124,7 @@ const Navbar1 = ({
   const isAuthenticated = !!session;
 
   const visibleMenu = menu.filter(
-    (item) => !item.requiresAuth || isAuthenticated
+    (item) => !item.requiresAuth || isAuthenticated,
   );
 
   const handleLogout = async () => {
@@ -154,8 +154,8 @@ const Navbar1 = ({
             </div>
           </div>
           <div className="flex gap-2">
-            {!isLoading && (
-              isAuthenticated ? (
+            {!isLoading &&
+              (isAuthenticated ? (
                 <Button variant="outline" size="sm" onClick={handleLogout}>
                   {auth.logout?.title ?? "Logout"}
                 </Button>
@@ -168,8 +168,7 @@ const Navbar1 = ({
                     <a href={auth.signup.url}>{auth.signup.title}</a>
                   </Button>
                 </>
-              )
-            )}
+              ))}
           </div>
         </nav>
 
@@ -204,8 +203,8 @@ const Navbar1 = ({
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
-                    {!isLoading && (
-                      isAuthenticated ? (
+                    {!isLoading &&
+                      (isAuthenticated ? (
                         <Button variant="outline" onClick={handleLogout}>
                           {auth.logout?.title ?? "Logout"}
                         </Button>
@@ -218,8 +217,7 @@ const Navbar1 = ({
                             <a href={auth.signup.url}>{auth.signup.title}</a>
                           </Button>
                         </>
-                      )
-                    )}
+                      ))}
                   </div>
                 </div>
               </SheetContent>
