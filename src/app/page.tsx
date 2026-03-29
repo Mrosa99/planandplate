@@ -13,7 +13,7 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br  flex flex-col items-center justify-start p-6">
+    <main className="min-h-screen bg-linear-to-br  flex flex-col items-center justify-start p-6">
       {/* Header */}
       <header className="w-full max-w-6xl flex flex-col sm:flex-row items-center justify-between py-8">
         <h1 className="text-4xl sm:text-5xl font-bold text-primary">
@@ -36,17 +36,17 @@ export default async function HomePage() {
               href="/"
               className="px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-orange-700 transition"
             >
-              Fetch Meals
+              View all meals
             </a>
             <a
               href="/"
               className="px-6 py-3 border border-primary text-primary font-semibold rounded-lg hover:bg-orange-50 transition"
             >
-              Browse Meals
+              View favorites
             </a>
           </div>
         </div>
-        <div className="flex-1 relative w-full aspect-[4/3] max-h-[500px] group overflow-hidden rounded-lg shadow-lg">
+        <div className="flex-1 relative w-full aspect-4/3 max-h-125 group overflow-hidden rounded-lg shadow-lg">
           {MealData ? (
             <Image
               src={MealData[0].image_url}
@@ -88,7 +88,7 @@ export default async function HomePage() {
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
             </div>
           ) : (
             <div className="w-full aspect-square bg-gray-200 animate-pulse rounded-xl mb-6" />
@@ -109,7 +109,7 @@ export default async function HomePage() {
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
             </div>
           ) : (
             <div className="w-full aspect-square bg-gray-200 animate-pulse rounded-xl mb-6" />
@@ -130,7 +130,7 @@ export default async function HomePage() {
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
             </div>
           ) : (
             <div className="w-full aspect-square bg-gray-200 animate-pulse rounded-xl mb-6" />
