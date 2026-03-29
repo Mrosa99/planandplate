@@ -43,13 +43,12 @@ export function SignupForm({
     }
 
     try {
-      const data = await signup(email, password);
-      console.log("Signup success:", data);
+      await signup(email, password);
 
       // Redirect after signup
       nextRouter?.replace("/");
-    } catch (err: any) {
-      setError(err?.message ?? "Signup failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Signup failed");
     } finally {
       setLoading(false);
     }

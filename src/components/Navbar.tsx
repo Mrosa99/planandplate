@@ -73,7 +73,7 @@ const Navbar1 = ({
       items: [
         {
           title: "All Recipes",
-          description: "All Recipes",
+          description: "Explore our complete recipe library.",
           icon: <Book className="size-5 shrink-0" />,
           url: "/recipes",
         },

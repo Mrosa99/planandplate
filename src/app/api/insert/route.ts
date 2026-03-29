@@ -28,7 +28,7 @@ async function fetchMeals(letter: string): Promise<Meal[]> {
 
     const meals = (await res.json()).meals ?? [];
 
-    return meals.map((m: any) => ({
+    return meals.map((m: Record<string, string>) => ({
       external_id: m.idMeal,
       name: m.strMeal,
       image_url: m.strMealThumb,
@@ -58,8 +58,6 @@ export async function POST(req: NextRequest) {
     const results: Meal[][] = await Promise.all(letters.map(fetchMeals));
     const allMeals: Meal[] = results.flat();
 
-    console.log("Total meals to insert:", allMeals.length);
-
     if (allMeals.length === 0) {
       return NextResponse.json({ success: false, message: "No meals fetched" });
     }
@@ -67,9 +65,7 @@ export async function POST(req: NextRequest) {
     // Insert into Supabase
     const { data, error } = (await supabase.from("meals").upsert(allMeals, {
       onConflict: "external_id",
-    })) as { data: Meal[] | null; error: any };
-
-    console.log("Supabase response:", { dataLength: data?.length, error });
+    })) as { data: Meal[] | null; error: { message: string } | null };
 
     if (error) {
       return NextResponse.json(
@@ -82,10 +78,10 @@ export async function POST(req: NextRequest) {
       success: true,
       inserted: data ? data.length : 0,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Unexpected error inserting meals:", err);
     return NextResponse.json(
-      { success: false, error: err.message },
+      { success: false, error: err instanceof Error ? err.message : "Unknown error" },
       { status: 500 },
     );
   }

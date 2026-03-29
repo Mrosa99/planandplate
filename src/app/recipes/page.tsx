@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import MealCard from "@/components/mealCard";
+import MealCard from "@/components/MealCard";
 import {
   MealData,
   fetchMealsPagination,
@@ -43,7 +43,7 @@ const RecipesPage = () => {
           setPage((prev) => prev + 1);
         }
       },
-      { rootMargin: "200px" }, // trigger before reaching bottom
+      { rootMargin: "200px" },
     );
     observer.observe(observerRef.current);
     return () => observer.disconnect();

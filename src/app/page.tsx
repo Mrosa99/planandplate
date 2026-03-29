@@ -5,9 +5,9 @@ import { MealData } from "../lib/supabase/fetchMealsFromSupabase";
 
 export default async function HomePage() {
   // Fetch a random meal on the server
-  let MealData: MealData[] = [];
+  let mealData: MealData[] = [];
   try {
-    MealData = await fetchRandomMeals(4);
+    mealData = await fetchRandomMeals(4);
   } catch (err) {
     console.error("Error fetching random meal:", err);
   }
@@ -47,10 +47,10 @@ export default async function HomePage() {
           </div>
         </div>
         <div className="flex-1 relative w-full aspect-4/3 max-h-125 group overflow-hidden rounded-lg shadow-lg">
-          {MealData ? (
+          {mealData ? (
             <Image
-              src={MealData[0].image_url}
-              alt={MealData[0].name}
+              src={mealData[0].image_url}
+              alt={mealData[0].name}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
@@ -80,11 +80,11 @@ export default async function HomePage() {
         className="w-full max-w-6xl py-16 grid grid-cols-1 sm:grid-cols-3 gap-8"
       >
         <div className="group bg-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
-          {MealData[0] ? (
+          {mealData[0] ? (
             <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
               <Image
-                src={MealData[1].image_url}
-                alt={MealData[1].name}
+                src={mealData[1].image_url}
+                alt={mealData[1].name}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
@@ -101,11 +101,11 @@ export default async function HomePage() {
           </p>
         </div>
         <div className="group bg-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
-          {MealData[0] ? (
+          {mealData[0] ? (
             <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
               <Image
-                src={MealData[2].image_url}
-                alt={MealData[2].name}
+                src={mealData[2].image_url}
+                alt={mealData[2].name}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
@@ -122,11 +122,11 @@ export default async function HomePage() {
           </p>
         </div>
         <div className="group bg-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
-          {MealData[0] ? (
+          {mealData[0] ? (
             <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
               <Image
-                src={MealData[3].image_url}
-                alt={MealData[3].name}
+                src={mealData[3].image_url}
+                alt={mealData[3].name}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />

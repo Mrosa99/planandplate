@@ -1,5 +1,5 @@
 import { fetchMealData, MealData } from "@/lib/supabase/fetchMealsFromSupabase";
-import RecipePage from "@/components/recipePage";
+import RecipePage from "@/components/RecipePage";
 import { notFound } from "next/navigation";
 
 interface Props {
