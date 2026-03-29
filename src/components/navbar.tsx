@@ -156,7 +156,7 @@ const Navbar1 = ({
           <div className="flex gap-2">
             {!isLoading &&
               (isAuthenticated ? (
-                <Button variant="outline" size="sm" onClick={handleLogout}>
+                <Button size="sm" onClick={handleLogout}>
                   {auth.logout?.title ?? "Logout"}
                 </Button>
               ) : (
