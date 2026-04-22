@@ -2,8 +2,8 @@
 
 import {
   Book,
+  BookMarked,
   CalendarDays,
-  Clock,
   Heart,
   LogOut,
   Menu,
@@ -199,8 +199,8 @@ const Navbar1 = ({
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/history" className="flex items-center gap-2 cursor-pointer">
-                        <Clock className="size-4" /> History
+                      <Link href="/collections" className="flex items-center gap-2 cursor-pointer">
+                        <BookMarked className="size-4" /> Collections
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -279,7 +279,7 @@ const Navbar1 = ({
                         <div className="flex flex-col gap-1">
                           {[
                             { href: "/favorites", icon: <Heart className="size-4" />, label: "Favorites" },
-                            { href: "/history", icon: <Clock className="size-4" />, label: "History" },
+                            { href: "/collections", icon: <BookMarked className="size-4" />, label: "Collections" },
                             { href: "/meals", icon: <UtensilsCrossed className="size-4" />, label: "Meals" },
                             { href: "/calendar", icon: <CalendarDays className="size-4" />, label: "Calendar" },
                             { href: "/settings", icon: <Settings className="size-4" />, label: "Settings" },
