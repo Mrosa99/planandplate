@@ -1,6 +1,19 @@
 "use client";
 
-import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
+import {
+  Book,
+  CalendarDays,
+  Clock,
+  Heart,
+  LogOut,
+  Menu,
+  Settings,
+  Sunset,
+  Trees,
+  UtensilsCrossed,
+  Zap,
+} from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import { useAuthSession } from "@/lib/supabase/useAuthSession";
@@ -27,6 +40,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface MenuItem {
   title: string;
@@ -119,9 +140,11 @@ const Navbar1 = ({
     logout: { title: "Logout" },
   },
 }: Navbar1Props) => {
-  const { session, isLoading } = useAuthSession();
+  const { session } = useAuthSession();
   const router = useRouter();
   const isAuthenticated = !!session;
+
+  const getInitials = (email: string) => email.slice(0, 2).toUpperCase();
 
   const visibleMenu = menu.filter(
     (item) => !item.requiresAuth || isAuthenticated,
@@ -154,21 +177,66 @@ const Navbar1 = ({
             </div>
           </div>
           <div className="flex gap-2">
-            {!isLoading &&
-              (isAuthenticated ? (
-                <Button size="sm" onClick={handleLogout}>
-                  {auth.logout?.title ?? "Logout"}
-                </Button>
+            {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full w-9 h-9 p-0 font-semibold"
+                    >
+                      {session ? getInitials(session.user.email ?? "?") : "?"}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                    <DropdownMenuLabel className="text-muted-foreground text-xs truncate">
+                      {session?.user.email}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/favorites" className="flex items-center gap-2 cursor-pointer">
+                        <Heart className="size-4" /> Favorites
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/history" className="flex items-center gap-2 cursor-pointer">
+                        <Clock className="size-4" /> History
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/meals" className="flex items-center gap-2 cursor-pointer">
+                        <UtensilsCrossed className="size-4" /> Meals
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/calendar" className="flex items-center gap-2 cursor-pointer">
+                        <CalendarDays className="size-4" /> Calendar
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
+                        <Settings className="size-4" /> Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
+                    >
+                      <LogOut className="size-4" /> Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <>
                   <Button asChild variant="outline" size="sm">
-                    <a href={auth.login.url}>{auth.login.title}</a>
+                    <Link href={auth.login.url}>{auth.login.title}</Link>
                   </Button>
                   <Button asChild size="sm">
-                    <a href={auth.signup.url}>{auth.signup.title}</a>
+                    <Link href={auth.signup.url}>{auth.signup.title}</Link>
                   </Button>
                 </>
-              ))}
+              )}
           </div>
         </nav>
 
@@ -203,21 +271,43 @@ const Navbar1 = ({
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
-                    {!isLoading &&
-                      (isAuthenticated ? (
-                        <Button variant="outline" onClick={handleLogout}>
-                          {auth.logout?.title ?? "Logout"}
+                    {isAuthenticated && (
+                      <>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {session?.user.email}
+                        </p>
+                        <div className="flex flex-col gap-1">
+                          {[
+                            { href: "/favorites", icon: <Heart className="size-4" />, label: "Favorites" },
+                            { href: "/history", icon: <Clock className="size-4" />, label: "History" },
+                            { href: "/meals", icon: <UtensilsCrossed className="size-4" />, label: "Meals" },
+                            { href: "/calendar", icon: <CalendarDays className="size-4" />, label: "Calendar" },
+                            { href: "/settings", icon: <Settings className="size-4" />, label: "Settings" },
+                          ].map(({ href, icon, label }) => (
+                            <Link
+                              key={label}
+                              href={href}
+                              className="flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium hover:bg-muted"
+                            >
+                              {icon} {label}
+                            </Link>
+                          ))}
+                        </div>
+                        <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+                          <LogOut className="size-4" /> {auth.logout?.title ?? "Logout"}
                         </Button>
-                      ) : (
-                        <>
-                          <Button asChild variant="outline">
-                            <a href={auth.login.url}>{auth.login.title}</a>
-                          </Button>
-                          <Button asChild>
-                            <a href={auth.signup.url}>{auth.signup.title}</a>
-                          </Button>
-                        </>
-                      ))}
+                      </>
+                    )}
+                    {!isAuthenticated && (
+                      <>
+                        <Button asChild variant="outline">
+                          <Link href={auth.login.url}>{auth.login.title}</Link>
+                        </Button>
+                        <Button asChild>
+                          <Link href={auth.signup.url}>{auth.signup.title}</Link>
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>
@@ -247,11 +337,13 @@ const renderMenuItem = (item: MenuItem) => {
 
   return (
     <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink
-        href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-accent-foreground"
-      >
-        {item.title}
+      <NavigationMenuLink asChild>
+        <Link
+          href={item.url}
+          className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-accent-foreground"
+        >
+          {item.title}
+        </Link>
       </NavigationMenuLink>
     </NavigationMenuItem>
   );
@@ -276,15 +368,15 @@ const renderMobileMenuItem = (item: MenuItem) => {
   }
 
   return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
+    <Link key={item.title} href={item.url} className="text-md font-semibold">
       {item.title}
-    </a>
+    </Link>
   );
 };
 
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
   return (
-    <a
+    <Link
       className="flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
       href={item.url}
     >
@@ -297,7 +389,7 @@ const SubMenuLink = ({ item }: { item: MenuItem }) => {
           </p>
         )}
       </div>
-    </a>
+    </Link>
   );
 };
 
