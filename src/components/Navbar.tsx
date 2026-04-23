@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/supabase-client";
-import { useAuthSession } from "@/lib/supabase/use-auth-session";
+import { useAuth } from "@/components/AuthProvider";
 
 import {
   Accordion,
@@ -140,7 +140,7 @@ const Navbar1 = ({
     logout: { title: "Logout" },
   },
 }: Navbar1Props) => {
-  const { session } = useAuthSession();
+  const { session } = useAuth();
   const router = useRouter();
   const isAuthenticated = !!session;
 

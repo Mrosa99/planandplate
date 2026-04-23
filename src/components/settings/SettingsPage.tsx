@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Pencil, X } from "lucide-react";
-import { useAuthSession } from "@/lib/supabase/use-auth-session";
+import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,7 @@ function getInitials(email: string) {
 }
 
 export function SettingsPage() {
-  const { session } = useAuthSession();
+  const { session } = useAuth();
   const email = session?.user.email ?? "";
 
   const [profileEditing, setProfileEditing] = useState(false);
