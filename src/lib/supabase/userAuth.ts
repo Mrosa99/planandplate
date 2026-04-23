@@ -7,7 +7,7 @@ export async function login(email: string, password: string) {
   });
 
   if (error) {
-    throw new Error(error.message ?? "Login failed");
+    throw new Error("Invalid email or password.");
   }
 
   return data;

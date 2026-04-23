@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import MealCard from "@/components/MealCard";
+import MealCard from "@/components/meals/MealCard";
 import {
   MealData,
   fetchMealsPagination,
@@ -17,7 +17,7 @@ const FavoritesPage = () => {
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // Fetch meals per page
+  // NEED TO REPLACE WITH FAVORITES FETCHING LOGIC
   const loadMeals = async () => {
     setLoading(true);
     const newMeals = await fetchMealsPagination(

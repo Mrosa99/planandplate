@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter as useNextRouter } from "next/navigation"; // optional, only for Next.js app router
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { login } from "@/lib/supabase/userAuth";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const nextRouter = typeof window !== "undefined" ? useNextRouter() : null;
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -29,18 +29,12 @@ export function LoginForm({
     setLoading(true);
 
     const form = e.currentTarget;
-
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const password = (form.elements.namedItem("password") as HTMLInputElement)
-      .value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
     try {
-      const data = await login(email, password);
-
-      if (nextRouter) {
-        nextRouter.push("/");
-        return;
-      }
+      await login(email, password);
+      router.push("/");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {

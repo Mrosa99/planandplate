@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import MealCard from "@/components/MealCard";
+import MealCard from "@/components/meals/MealCard";
 import {
   MealData,
   fetchMealsPagination,
