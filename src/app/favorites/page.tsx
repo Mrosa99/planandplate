@@ -2,10 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import MealCard from "@/components/meals/MealCard";
-import {
-  MealData,
-  fetchMealsPagination,
-} from "@/lib/supabase/fetch-meals";
+import { MealData, fetchMealsPagination } from "@/lib/supabase/fetch-meals";
 
 const PAGE_SIZE = 20;
 

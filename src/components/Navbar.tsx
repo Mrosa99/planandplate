@@ -15,8 +15,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/supabase-client";
 import { useAuth } from "@/components/AuthProvider";
+import { Logout } from "@/lib/supabase/user-auth";
 
 import {
   Accordion,
@@ -151,7 +151,7 @@ const Navbar1 = ({
   );
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await Logout();
     router.push("/");
   };
 
