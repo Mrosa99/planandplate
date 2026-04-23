@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "@/components/AuthProvider";
 
 export function useAuthSession() {
   return useAuth();

@@ -15,8 +15,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/supabaseClient";
-import { useAuthSession } from "@/lib/supabase/useAuthSession";
+import { supabase } from "@/lib/supabase/supabase-client";
+import { useAuthSession } from "@/lib/supabase/use-auth-session";
 
 import {
   Accordion,

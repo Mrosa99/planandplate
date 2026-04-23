@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { MealData } from "@/lib/supabase/fetchMealsFromSupabase";
+import { MealData } from "@/lib/supabase/fetch-meals";
 
 interface Props {
   meal: MealData;

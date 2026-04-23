@@ -1,5 +1,5 @@
 import React from "react";
-import { MealData } from "@/lib/supabase/fetchMealsFromSupabase";
+import { MealData } from "@/lib/supabase/fetch-meals";
 
 interface Props {
   meal: MealData;

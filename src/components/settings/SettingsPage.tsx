@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Pencil, X } from "lucide-react";
-import { useAuthSession } from "@/lib/supabase/useAuthSession";
+import { useAuthSession } from "@/lib/supabase/use-auth-session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

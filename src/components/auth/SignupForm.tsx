@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { signup } from "@/lib/register";
+import { signup } from "@/lib/supabase/register";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter as useNextRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export function SignupForm({
   className,
@@ -21,7 +21,7 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const nextRouter = typeof window !== "undefined" ? useNextRouter() : null;
+  const router = useRouter();
 
   async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,8 +45,7 @@ export function SignupForm({
     try {
       await signup(email, password);
 
-      // Redirect after signup
-      nextRouter?.replace("/");
+      router.replace("/");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Signup failed");
     } finally {

@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase } from "./supabase-client";
 
 export interface MealData {
   id_meal: number;

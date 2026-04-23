@@ -5,7 +5,7 @@ import MealCard from "@/components/meals/MealCard";
 import {
   MealData,
   fetchMealsPagination,
-} from "@/lib/supabase/fetchMealsFromSupabase";
+} from "@/lib/supabase/fetch-meals";
 
 const PAGE_SIZE = 20;
 
