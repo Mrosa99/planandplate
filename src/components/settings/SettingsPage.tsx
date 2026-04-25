@@ -9,6 +9,7 @@ import {
   ChangeFullName,
   ChangeAvatar,
 } from "@/lib/supabase/profile";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -28,14 +29,14 @@ import {
 } from "@/components/ui/dialog";
 
 const AVATARS = [
-  { id: "chef",  emoji: "👨‍🍳", bg: "bg-orange-400" },
-  { id: "bowl",  emoji: "🍜", bg: "bg-yellow-400" },
-  { id: "salad", emoji: "🥗", bg: "bg-green-400"  },
-  { id: "pizza", emoji: "🍕", bg: "bg-red-400"    },
-  { id: "taco",  emoji: "🌮", bg: "bg-amber-400"  },
-  { id: "sushi", emoji: "🍱", bg: "bg-blue-400"   },
-  { id: "cake",  emoji: "🎂", bg: "bg-pink-400"   },
-  { id: "fruit", emoji: "🍓", bg: "bg-rose-400"   },
+  { id: "chef", emoji: "👨‍🍳", bg: "bg-orange-400" },
+  { id: "bowl", emoji: "🍜", bg: "bg-yellow-400" },
+  { id: "salad", emoji: "🥗", bg: "bg-green-400" },
+  { id: "pizza", emoji: "🍕", bg: "bg-red-400" },
+  { id: "taco", emoji: "🌮", bg: "bg-amber-400" },
+  { id: "sushi", emoji: "🍱", bg: "bg-blue-400" },
+  { id: "cake", emoji: "🎂", bg: "bg-pink-400" },
+  { id: "fruit", emoji: "🍓", bg: "bg-rose-400" },
 ];
 
 function getInitials(email: string) {
@@ -93,7 +94,7 @@ export function SettingsPage() {
         setFullName(data.full_name ?? "");
         setAvatar(data.avatar ?? "");
       })
-      .catch(() => {});
+      .catch(() => toast.error("Failed to load profile"));
   }, [session?.user.id]);
 
   const selectedAvatar = AVATARS.find((a) => a.id === avatar);
@@ -102,8 +103,9 @@ export function SettingsPage() {
     try {
       await ChangeAvatar(session!.user.id, id);
       setAvatar(id);
+      toast.success("Avatar updated");
     } catch {
-      // silently fail — avatar is non-critical
+      toast.error("Failed to update avatar");
     } finally {
       setAvatarPickerOpen(false);
     }
@@ -120,9 +122,12 @@ export function SettingsPage() {
     try {
       await ChangeFullName(session!.user.id, newFullName.trim());
       setFullName(newFullName.trim());
+      toast.success("Name updated");
       setFullNameOpen(false);
     } catch (err: unknown) {
-      setFullNameError(err instanceof Error ? err.message : "Something went wrong.");
+      setFullNameError(
+        err instanceof Error ? err.message : "Something went wrong.",
+      );
     } finally {
       setNewFullName("");
       setFullNameLoading(false);
@@ -148,6 +153,7 @@ export function SettingsPage() {
     try {
       await ChangeUsername(session!.user.id, newUsername.trim());
       setUsername(newUsername.trim());
+      toast.success("Username updated");
       setUsernameOpen(false);
     } catch (err: unknown) {
       setUsernameError(
@@ -498,9 +504,7 @@ export function SettingsPage() {
                 Email updated. Check your new inbox for a confirmation link.
               </p>
             )}
-            {emailError && (
-              <p className="text-sm text-red-500">{emailError}</p>
-            )}
+            {emailError && <p className="text-sm text-red-500">{emailError}</p>}
             <div className="flex flex-col gap-2">
               <Label htmlFor="new-email">New Email</Label>
               <Input
@@ -542,10 +546,7 @@ export function SettingsPage() {
             will receive a confirmation link at your new address.
           </p>
           <div className="flex justify-end gap-2 mt-4">
-            <Button
-              variant="ghost"
-              onClick={() => setEmailConfirmOpen(false)}
-            >
+            <Button variant="ghost" onClick={() => setEmailConfirmOpen(false)}>
               Cancel
             </Button>
             <Button onClick={handleEmailConfirm} disabled={emailLoading}>
