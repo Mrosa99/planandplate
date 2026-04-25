@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { ChangePassword, ChangeEmail } from "@/lib/supabase/user-auth";
+import { fetchProfile, ChangeUsername } from "@/lib/supabase/profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +31,52 @@ export function SettingsPage() {
   const { session } = useAuth();
   const email = session?.user.email ?? "";
 
+  const [username, setUsername] = useState("");
+  const [usernameEditing, setUsernameEditing] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [usernameLoading, setUsernameLoading] = useState(false);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [usernameSuccess, setUsernameSuccess] = useState(false);
+  const [usernameConfirmOpen, setUsernameConfirmOpen] = useState(false);
+
   const [profileEditing, setProfileEditing] = useState(false);
+
+  useEffect(() => {
+    if (!session?.user.id) return;
+    fetchProfile(session.user.id)
+      .then(data => setUsername(data.username ?? ""))
+      .catch(() => {});
+  }, [session?.user.id]);
+
+  function handleUsernameUpdateClick() {
+    setUsernameError(null);
+    setUsernameSuccess(false);
+    if (!newUsername.trim()) {
+      setUsernameError("Please enter a new username.");
+      return;
+    }
+    if (newUsername.trim() === username) {
+      setUsernameError("New username must be different from your current one.");
+      return;
+    }
+    setUsernameConfirmOpen(true);
+  }
+
+  async function handleUsernameConfirm() {
+    setUsernameLoading(true);
+    try {
+      await ChangeUsername(session!.user.id, newUsername.trim());
+      setUsername(newUsername.trim());
+      setUsernameSuccess(true);
+      setUsernameEditing(false);
+    } catch (err: unknown) {
+      setUsernameError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setNewUsername("");
+      setUsernameLoading(false);
+      setUsernameConfirmOpen(false);
+    }
+  }
   const [securityEditing, setSecurityEditing] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -73,12 +119,12 @@ export function SettingsPage() {
     try {
       await ChangeEmail(email, newEmail, emailPassword);
       setEmailSuccess(true);
-      setNewEmail("");
-      setEmailPassword("");
       setEmailEditing(false);
     } catch (err: unknown) {
       setEmailError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
+      setNewEmail("");
+      setEmailPassword("");
       setEmailLoading(false);
       setEmailConfirmOpen(false);
     }
@@ -105,13 +151,13 @@ export function SettingsPage() {
     try {
       await ChangePassword(email, currentPassword, newPassword);
       setPasswordSuccess(true);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
       setSecurityEditing(false);
     } catch (err: unknown) {
       setPasswordError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
       setPasswordLoading(false);
       setConfirmOpen(false);
     }
@@ -230,6 +276,70 @@ export function SettingsPage() {
         </Card>
 
         {profileEditing && <>
+        {/* Username */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle>Username</CardTitle>
+                <CardDescription className="mt-1">
+                  {usernameEditing ? "Enter your new username." : "Manage your username."}
+                </CardDescription>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => setUsernameEditing((v) => !v)}
+              >
+                {usernameEditing ? (
+                  <><X className="size-4" /> Cancel</>
+                ) : (
+                  <><Pencil className="size-4" /> Edit</>
+                )}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-5">
+            {usernameSuccess && (
+              <p className="text-sm text-green-500">Username updated successfully.</p>
+            )}
+            {usernameError && (
+              <p className="text-sm text-red-500">{usernameError}</p>
+            )}
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="current-username">Current Username</Label>
+              <Input
+                id="current-username"
+                value={username || "Not set"}
+                readOnly
+                className="opacity-60 cursor-not-allowed"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="new-username">New Username</Label>
+              <Input
+                id="new-username"
+                placeholder="johndoe"
+                readOnly={!usernameEditing}
+                value={newUsername}
+                onChange={e => setNewUsername(e.target.value)}
+                className={!usernameEditing ? "opacity-60 cursor-not-allowed" : ""}
+              />
+            </div>
+          </CardContent>
+          {usernameEditing && (
+            <CardFooter className="justify-end gap-2">
+              <Button variant="ghost" onClick={() => setUsernameEditing(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUsernameUpdateClick}>
+                Update Username
+              </Button>
+            </CardFooter>
+          )}
+        </Card>
+
         {/* Email */}
         <Card>
           <CardHeader>
@@ -390,6 +500,25 @@ export function SettingsPage() {
         </>}
 
       </div>
+
+      <Dialog open={usernameConfirmOpen} onOpenChange={setUsernameConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Username Change</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to change your username to <span className="font-medium text-foreground">@{newUsername}</span>?
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="ghost" onClick={() => setUsernameConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleUsernameConfirm} disabled={usernameLoading}>
+              {usernameLoading ? "Updating..." : "Yes, change username"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={emailConfirmOpen} onOpenChange={setEmailConfirmOpen}>
         <DialogContent>

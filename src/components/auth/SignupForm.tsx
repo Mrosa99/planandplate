@@ -30,11 +30,9 @@ export function SignupForm({
 
     const form = e.currentTarget;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const password = (form.elements.namedItem("password") as HTMLInputElement)
-      .value;
-    const confirmPassword = (
-      form.elements.namedItem("confirmPassword") as HTMLInputElement
-    ).value;
+    const username = (form.elements.namedItem("username") as HTMLInputElement).value.trim();
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+    const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement).value;
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -43,7 +41,7 @@ export function SignupForm({
     }
 
     try {
-      await Signup(email, password);
+      await Signup(email, password, username);
 
       router.replace("/");
     } catch (err: unknown) {
@@ -72,6 +70,17 @@ export function SignupForm({
                   name="email"
                   type="email"
                   placeholder="me@example.com"
+                  required
+                />
+              </div>
+
+              <div className="grid gap-3">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  name="username"
+                  type="text"
+                  placeholder="johndoe"
                   required
                 />
               </div>
