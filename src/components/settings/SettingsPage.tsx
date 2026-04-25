@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Pencil, X } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { ChangePassword, ChangeEmail } from "@/lib/supabase/user-auth";
-import { fetchProfile, ChangeUsername } from "@/lib/supabase/profile";
+import {
+  fetchProfile,
+  ChangeUsername,
+  ChangeFullName,
+  ChangeAvatar,
+} from "@/lib/supabase/profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
   CardDescription,
@@ -23,6 +27,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+const AVATARS = [
+  { id: "chef",  emoji: "👨‍🍳", bg: "bg-orange-400" },
+  { id: "bowl",  emoji: "🍜", bg: "bg-yellow-400" },
+  { id: "salad", emoji: "🥗", bg: "bg-green-400"  },
+  { id: "pizza", emoji: "🍕", bg: "bg-red-400"    },
+  { id: "taco",  emoji: "🌮", bg: "bg-amber-400"  },
+  { id: "sushi", emoji: "🍱", bg: "bg-blue-400"   },
+  { id: "cake",  emoji: "🎂", bg: "bg-pink-400"   },
+  { id: "fruit", emoji: "🍓", bg: "bg-rose-400"   },
+];
+
 function getInitials(email: string) {
   return email.slice(0, 2).toUpperCase();
 }
@@ -32,25 +47,91 @@ export function SettingsPage() {
   const email = session?.user.email ?? "";
 
   const [username, setUsername] = useState("");
-  const [usernameEditing, setUsernameEditing] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [avatar, setAvatar] = useState("");
+
+  // Avatar picker
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
+
+  // Username dialog
+  const [usernameOpen, setUsernameOpen] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [usernameLoading, setUsernameLoading] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
-  const [usernameSuccess, setUsernameSuccess] = useState(false);
   const [usernameConfirmOpen, setUsernameConfirmOpen] = useState(false);
 
-  const [profileEditing, setProfileEditing] = useState(false);
+  // Name dialog
+  const [fullNameOpen, setFullNameOpen] = useState(false);
+  const [newFullName, setNewFullName] = useState("");
+  const [fullNameLoading, setFullNameLoading] = useState(false);
+  const [fullNameError, setFullNameError] = useState<string | null>(null);
+
+  // Email dialog
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [emailPassword, setEmailPassword] = useState("");
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailSuccess, setEmailSuccess] = useState(false);
+  const [emailConfirmOpen, setEmailConfirmOpen] = useState(false);
+
+  // Password dialog
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!session?.user.id) return;
     fetchProfile(session.user.id)
-      .then(data => setUsername(data.username ?? ""))
+      .then((data) => {
+        setUsername(data.username ?? "");
+        setFullName(data.full_name ?? "");
+        setAvatar(data.avatar ?? "");
+      })
       .catch(() => {});
   }, [session?.user.id]);
 
+  const selectedAvatar = AVATARS.find((a) => a.id === avatar);
+
+  async function handleAvatarSelect(id: string) {
+    try {
+      await ChangeAvatar(session!.user.id, id);
+      setAvatar(id);
+    } catch {
+      // silently fail — avatar is non-critical
+    } finally {
+      setAvatarPickerOpen(false);
+    }
+  }
+
+  // --- Name handlers ---
+  async function handleFullNameUpdate() {
+    setFullNameError(null);
+    if (!newFullName.trim()) {
+      setFullNameError("Please enter a name.");
+      return;
+    }
+    setFullNameLoading(true);
+    try {
+      await ChangeFullName(session!.user.id, newFullName.trim());
+      setFullName(newFullName.trim());
+      setFullNameOpen(false);
+    } catch (err: unknown) {
+      setFullNameError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setNewFullName("");
+      setFullNameLoading(false);
+    }
+  }
+
+  // --- Username handlers ---
   function handleUsernameUpdateClick() {
     setUsernameError(null);
-    setUsernameSuccess(false);
     if (!newUsername.trim()) {
       setUsernameError("Please enter a new username.");
       return;
@@ -67,37 +148,22 @@ export function SettingsPage() {
     try {
       await ChangeUsername(session!.user.id, newUsername.trim());
       setUsername(newUsername.trim());
-      setUsernameSuccess(true);
-      setUsernameEditing(false);
+      setUsernameOpen(false);
     } catch (err: unknown) {
-      setUsernameError(err instanceof Error ? err.message : "Something went wrong.");
+      setUsernameError(
+        err instanceof Error ? err.message : "Something went wrong.",
+      );
     } finally {
       setNewUsername("");
       setUsernameLoading(false);
       setUsernameConfirmOpen(false);
     }
   }
-  const [securityEditing, setSecurityEditing] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const [emailEditing, setEmailEditing] = useState(false);
-  const [newEmail, setNewEmail] = useState("");
-  const [emailPassword, setEmailPassword] = useState("");
-  const [emailLoading, setEmailLoading] = useState(false);
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [emailSuccess, setEmailSuccess] = useState(false);
-  const [emailConfirmOpen, setEmailConfirmOpen] = useState(false);
-
+  // --- Email handlers ---
   function handleEmailUpdateClick() {
     setEmailError(null);
     setEmailSuccess(false);
-
     if (!newEmail.trim()) {
       setEmailError("Please enter a new email address.");
       return;
@@ -110,7 +176,6 @@ export function SettingsPage() {
       setEmailError("Please enter your password to confirm.");
       return;
     }
-
     setEmailConfirmOpen(true);
   }
 
@@ -119,9 +184,10 @@ export function SettingsPage() {
     try {
       await ChangeEmail(email, newEmail, emailPassword);
       setEmailSuccess(true);
-      setEmailEditing(false);
     } catch (err: unknown) {
-      setEmailError(err instanceof Error ? err.message : "Something went wrong.");
+      setEmailError(
+        err instanceof Error ? err.message : "Something went wrong.",
+      );
     } finally {
       setNewEmail("");
       setEmailPassword("");
@@ -130,10 +196,10 @@ export function SettingsPage() {
     }
   }
 
+  // --- Password handlers ---
   function handleUpdateClick() {
     setPasswordError(null);
     setPasswordSuccess(false);
-
     if (newPassword.length < 8) {
       setPasswordError("New password must be at least 8 characters.");
       return;
@@ -142,7 +208,6 @@ export function SettingsPage() {
       setPasswordError("New passwords do not match.");
       return;
     }
-
     setConfirmOpen(true);
   }
 
@@ -151,9 +216,10 @@ export function SettingsPage() {
     try {
       await ChangePassword(email, currentPassword, newPassword);
       setPasswordSuccess(true);
-      setSecurityEditing(false);
     } catch (err: unknown) {
-      setPasswordError(err instanceof Error ? err.message : "Something went wrong.");
+      setPasswordError(
+        err instanceof Error ? err.message : "Something went wrong.",
+      );
     } finally {
       setCurrentPassword("");
       setNewPassword("");
@@ -166,231 +232,283 @@ export function SettingsPage() {
   return (
     <main className="min-h-screen py-12 px-4">
       <div className="max-w-2xl mx-auto flex flex-col gap-8">
-
         {/* Avatar + identity */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-3xl font-bold select-none">
-            {email ? getInitials(email) : "?"}
-          </div>
-          <div className="text-center">
-            <p className="text-lg font-semibold">Your Name</p>
+        <div className="flex flex-col items-center gap-2">
+          <button
+            className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            onClick={() => setAvatarPickerOpen(true)}
+          >
+            <div
+              className={`w-24 h-24 rounded-full flex items-center justify-center text-4xl select-none ${
+                selectedAvatar ? selectedAvatar.bg : "bg-primary"
+              }`}
+            >
+              {selectedAvatar ? (
+                selectedAvatar.emoji
+              ) : (
+                <span className="text-primary-foreground text-3xl font-bold">
+                  {email ? getInitials(email) : "?"}
+                </span>
+              )}
+            </div>
+          </button>
+          <p className="text-xs text-muted-foreground">Click to change</p>
+          <div className="text-center mt-1">
+            <p className="text-lg font-semibold">{username || "—"}</p>
             <p className="text-sm text-muted-foreground">{email}</p>
           </div>
         </div>
 
-        {/* Profile Information */}
+        {/* Account settings */}
         <Card>
           <CardHeader>
-            <div className="flex items-start justify-between">
+            <CardTitle>Account</CardTitle>
+            <CardDescription>Manage your account settings.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription className="mt-1">
-                  {profileEditing ? "Make your changes below." : "View and update your personal details."}
-                </CardDescription>
+                <p className="text-sm font-medium">Username</p>
+                <p className="text-sm text-muted-foreground">
+                  {username || "Not set"}
+                </p>
               </div>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="gap-1.5"
-                onClick={() => setProfileEditing((v) => !v)}
+                onClick={() => {
+                  setUsernameError(null);
+                  setNewUsername("");
+                  setUsernameOpen(true);
+                }}
               >
-                {profileEditing ? (
-                  <><X className="size-4" /> Cancel</>
-                ) : (
-                  <><Pencil className="size-4" /> Edit</>
-                )}
+                Change
               </Button>
             </div>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="first-name">First Name</Label>
-                <Input
-                  id="first-name"
-                  placeholder="John"
-                  readOnly={!profileEditing}
-                  className={!profileEditing ? "opacity-60 cursor-not-allowed" : ""}
-                />
+            <div className="border-t" />
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Name</p>
+                <p className="text-sm text-muted-foreground">
+                  {fullName || "Not set"}
+                </p>
               </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="last-name">Last Name</Label>
-                <Input
-                  id="last-name"
-                  placeholder="Doe"
-                  readOnly={!profileEditing}
-                  className={!profileEditing ? "opacity-60 cursor-not-allowed" : ""}
-                />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setFullNameError(null);
+                  setNewFullName("");
+                  setFullNameOpen(true);
+                }}
+              >
+                Change
+              </Button>
+            </div>
+            <div className="border-t" />
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Email</p>
+                <p className="text-sm text-muted-foreground">{email}</p>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setEmailError(null);
+                  setEmailSuccess(false);
+                  setNewEmail("");
+                  setEmailPassword("");
+                  setEmailOpen(true);
+                }}
+              >
+                Change
+              </Button>
             </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                placeholder="johndoe"
-                readOnly={!profileEditing}
-                className={!profileEditing ? "opacity-60 cursor-not-allowed" : ""}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                readOnly
-                className="opacity-60 cursor-not-allowed"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-                readOnly={!profileEditing}
-                className={!profileEditing ? "opacity-60 cursor-not-allowed" : ""}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="bio">Bio</Label>
-              <textarea
-                id="bio"
-                rows={3}
-                placeholder="Tell us a little about yourself..."
-                readOnly={!profileEditing}
-                className={`flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none ${!profileEditing ? "opacity-60 cursor-not-allowed" : ""}`}
-              />
+            <div className="border-t" />
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Password</p>
+                <p className="text-sm text-muted-foreground">••••••••</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setPasswordError(null);
+                  setPasswordSuccess(false);
+                  setCurrentPassword("");
+                  setNewPassword("");
+                  setConfirmPassword("");
+                  setPasswordOpen(true);
+                }}
+              >
+                Change
+              </Button>
             </div>
           </CardContent>
-          {profileEditing && (
-            <CardFooter className="justify-end gap-2">
-              <Button variant="ghost" onClick={() => setProfileEditing(false)}>
+        </Card>
+      </div>
+
+      {/* Avatar picker dialog */}
+      <Dialog open={avatarPickerOpen} onOpenChange={setAvatarPickerOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Choose an Avatar</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-4 gap-3 mt-2">
+            {AVATARS.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => handleAvatarSelect(a.id)}
+                className={`rounded-full w-16 h-16 flex items-center justify-center text-3xl mx-auto transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${a.bg} ${
+                  avatar === a.id ? "ring-2 ring-ring ring-offset-2" : ""
+                }`}
+              >
+                {a.emoji}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Name dialog */}
+      <Dialog
+        open={fullNameOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setNewFullName("");
+            setFullNameError(null);
+          }
+          setFullNameOpen(open);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Name</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            {fullNameError && (
+              <p className="text-sm text-red-500">{fullNameError}</p>
+            )}
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="new-full-name">New Name</Label>
+              <Input
+                id="new-full-name"
+                placeholder="John Doe"
+                value={newFullName}
+                onChange={(e) => setNewFullName(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setFullNameOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={() => setProfileEditing(false)}>
-                Save Changes
-              </Button>
-            </CardFooter>
-          )}
-        </Card>
-
-        {profileEditing && <>
-        {/* Username */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle>Username</CardTitle>
-                <CardDescription className="mt-1">
-                  {usernameEditing ? "Enter your new username." : "Manage your username."}
-                </CardDescription>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1.5"
-                onClick={() => setUsernameEditing((v) => !v)}
-              >
-                {usernameEditing ? (
-                  <><X className="size-4" /> Cancel</>
-                ) : (
-                  <><Pencil className="size-4" /> Edit</>
-                )}
+              <Button onClick={handleFullNameUpdate} disabled={fullNameLoading}>
+                {fullNameLoading ? "Saving..." : "Update Name"}
               </Button>
             </div>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-5">
-            {usernameSuccess && (
-              <p className="text-sm text-green-500">Username updated successfully.</p>
-            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Username dialog */}
+      <Dialog
+        open={usernameOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setNewUsername("");
+            setUsernameError(null);
+          }
+          setUsernameOpen(open);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Username</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
             {usernameError && (
               <p className="text-sm text-red-500">{usernameError}</p>
             )}
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="current-username">Current Username</Label>
-              <Input
-                id="current-username"
-                value={username || "Not set"}
-                readOnly
-                className="opacity-60 cursor-not-allowed"
-              />
-            </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="new-username">New Username</Label>
               <Input
                 id="new-username"
                 placeholder="johndoe"
-                readOnly={!usernameEditing}
                 value={newUsername}
-                onChange={e => setNewUsername(e.target.value)}
-                className={!usernameEditing ? "opacity-60 cursor-not-allowed" : ""}
+                onChange={(e) => setNewUsername(e.target.value)}
               />
             </div>
-          </CardContent>
-          {usernameEditing && (
-            <CardFooter className="justify-end gap-2">
-              <Button variant="ghost" onClick={() => setUsernameEditing(false)}>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setUsernameOpen(false)}>
                 Cancel
               </Button>
               <Button onClick={handleUsernameUpdateClick}>
                 Update Username
               </Button>
-            </CardFooter>
-          )}
-        </Card>
-
-        {/* Email */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle>Email Address</CardTitle>
-                <CardDescription className="mt-1">
-                  {emailEditing ? "Enter your new email and confirm with your password." : "Manage your email address."}
-                </CardDescription>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1.5"
-                onClick={() => setEmailEditing((v) => !v)}
-              >
-                {emailEditing ? (
-                  <><X className="size-4" /> Cancel</>
-                ) : (
-                  <><Pencil className="size-4" /> Edit</>
-                )}
-              </Button>
             </div>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-5">
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={usernameConfirmOpen} onOpenChange={setUsernameConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Username Change</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to change your username to{" "}
+            <span className="font-medium text-foreground">@{newUsername}</span>?
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              variant="ghost"
+              onClick={() => setUsernameConfirmOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleUsernameConfirm} disabled={usernameLoading}>
+              {usernameLoading ? "Updating..." : "Yes, change username"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Email dialog */}
+      <Dialog
+        open={emailOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setNewEmail("");
+            setEmailPassword("");
+            setEmailError(null);
+            setEmailSuccess(false);
+          }
+          setEmailOpen(open);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Email</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
             {emailSuccess && (
-              <p className="text-sm text-green-500">Email updated. Check your new inbox for a confirmation link.</p>
+              <p className="text-sm text-green-500">
+                Email updated. Check your new inbox for a confirmation link.
+              </p>
             )}
             {emailError && (
               <p className="text-sm text-red-500">{emailError}</p>
             )}
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="current-email">Current Email</Label>
-              <Input
-                id="current-email"
-                type="email"
-                value={email}
-                readOnly
-                className="opacity-60 cursor-not-allowed"
-              />
-            </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="new-email">New Email</Label>
               <Input
                 id="new-email"
                 type="email"
                 placeholder="new@example.com"
-                readOnly={!emailEditing}
                 value={newEmail}
-                onChange={e => setNewEmail(e.target.value)}
-                className={!emailEditing ? "opacity-60 cursor-not-allowed" : ""}
+                onChange={(e) => setNewEmail(e.target.value)}
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -399,123 +517,16 @@ export function SettingsPage() {
                 id="email-password"
                 type="password"
                 placeholder="••••••••"
-                readOnly={!emailEditing}
                 value={emailPassword}
-                onChange={e => setEmailPassword(e.target.value)}
-                className={!emailEditing ? "opacity-60 cursor-not-allowed" : ""}
+                onChange={(e) => setEmailPassword(e.target.value)}
               />
             </div>
-          </CardContent>
-          {emailEditing && (
-            <CardFooter className="justify-end gap-2">
-              <Button variant="ghost" onClick={() => setEmailEditing(false)}>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setEmailOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleEmailUpdateClick}>
-                Update Email
-              </Button>
-            </CardFooter>
-          )}
-        </Card>
-
-        {/* Security */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle>Security</CardTitle>
-                <CardDescription className="mt-1">
-                  {securityEditing ? "Enter your current and new password." : "Manage your password."}
-                </CardDescription>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1.5"
-                onClick={() => setSecurityEditing((v) => !v)}
-              >
-                {securityEditing ? (
-                  <><X className="size-4" /> Cancel</>
-                ) : (
-                  <><Pencil className="size-4" /> Edit</>
-                )}
-              </Button>
+              <Button onClick={handleEmailUpdateClick}>Update Email</Button>
             </div>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-5">
-            {passwordSuccess && (
-              <p className="text-sm text-green-500">Password updated successfully.</p>
-            )}
-            {passwordError && (
-              <p className="text-sm text-red-500">{passwordError}</p>
-            )}
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="current-password">Current Password</Label>
-              <Input
-                id="current-password"
-                type="password"
-                placeholder="••••••••"
-                readOnly={!securityEditing}
-                value={currentPassword}
-                onChange={e => setCurrentPassword(e.target.value)}
-                className={!securityEditing ? "opacity-60 cursor-not-allowed" : ""}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="new-password">New Password</Label>
-              <Input
-                id="new-password"
-                type="password"
-                placeholder="••••••••"
-                readOnly={!securityEditing}
-                value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
-                className={!securityEditing ? "opacity-60 cursor-not-allowed" : ""}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                placeholder="••••••••"
-                readOnly={!securityEditing}
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                className={!securityEditing ? "opacity-60 cursor-not-allowed" : ""}
-              />
-            </div>
-          </CardContent>
-          {securityEditing && (
-            <CardFooter className="justify-end gap-2">
-              <Button variant="ghost" onClick={() => setSecurityEditing(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleUpdateClick}>
-                Update Password
-              </Button>
-            </CardFooter>
-          )}
-        </Card>
-        </>}
-
-      </div>
-
-      <Dialog open={usernameConfirmOpen} onOpenChange={setUsernameConfirmOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Username Change</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            Are you sure you want to change your username to <span className="font-medium text-foreground">@{newUsername}</span>?
-          </p>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="ghost" onClick={() => setUsernameConfirmOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleUsernameConfirm} disabled={usernameLoading}>
-              {usernameLoading ? "Updating..." : "Yes, change username"}
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -526,10 +537,15 @@ export function SettingsPage() {
             <DialogTitle>Confirm Email Change</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Are you sure you want to change your email to <span className="font-medium text-foreground">{newEmail}</span>? You will receive a confirmation link at your new address.
+            Are you sure you want to change your email to{" "}
+            <span className="font-medium text-foreground">{newEmail}</span>? You
+            will receive a confirmation link at your new address.
           </p>
           <div className="flex justify-end gap-2 mt-4">
-            <Button variant="ghost" onClick={() => setEmailConfirmOpen(false)}>
+            <Button
+              variant="ghost"
+              onClick={() => setEmailConfirmOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleEmailConfirm} disabled={emailLoading}>
@@ -539,13 +555,84 @@ export function SettingsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Change Password dialog */}
+      <Dialog
+        open={passwordOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+            setPasswordError(null);
+            setPasswordSuccess(false);
+          }
+          setPasswordOpen(open);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+          </DialogHeader>
+          {passwordSuccess ? (
+            <div className="flex flex-col gap-4">
+              <p className="text-sm text-green-500">
+                Password updated successfully.
+              </p>
+              <div className="flex justify-end">
+                <Button onClick={() => setPasswordOpen(false)}>Close</Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {passwordError && (
+                <p className="text-sm text-red-500">{passwordError}</p>
+              )}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="current-password">Current Password</Label>
+                <PasswordInput
+                  id="current-password"
+                  placeholder="••••••••"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <PasswordInput
+                  id="new-password"
+                  placeholder="••••••••"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <PasswordInput
+                  id="confirm-password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setPasswordOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleUpdateClick}>Update Password</Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Password Change</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Are you sure you want to change your password? You will need to use your new password next time you log in.
+            Are you sure you want to change your password? You will need to use
+            your new password next time you log in.
           </p>
           <div className="flex justify-end gap-2 mt-4">
             <Button variant="ghost" onClick={() => setConfirmOpen(false)}>
