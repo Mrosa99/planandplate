@@ -81,7 +81,10 @@ export async function POST(req: NextRequest) {
   } catch (err: unknown) {
     console.error("Unexpected error inserting meals:", err);
     return NextResponse.json(
-      { success: false, error: err instanceof Error ? err.message : "Unknown error" },
+      {
+        success: false,
+        error: err instanceof Error ? err.message : "Unknown error",
+      },
       { status: 500 },
     );
   }
