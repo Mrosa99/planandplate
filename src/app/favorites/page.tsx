@@ -1,72 +1,92 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import { useCallback, useState } from "react";
 import MealCard from "@/components/meals/MealCard";
-import { MealData, fetchMealsPagination } from "@/lib/supabase/fetch-meals";
+import { fetchFavoritePagination, removeFavorite } from "@/lib/supabase/favorites";
+import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
+import { useAuth } from "@/components/AuthProvider";
 
-const PAGE_SIZE = 20;
+const FavoritesList = ({ userId }: { userId: string }) => {
+  const fetchFn = useCallback(
+    (limit: number, offset: number) => fetchFavoritePagination(userId, limit, offset),
+    [userId],
+  );
 
-const FavoritesPage = () => {
-  const [meals, setMeals] = useState<MealData[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const { items: meals, loading, hasMore, observerRef, removeItem } = useInfiniteScroll(fetchFn);
+  const [removingIds, setRemovingIds] = useState<Set<string>>(new Set());
 
-  const observerRef = useRef<HTMLDivElement | null>(null);
-
-  // NEED TO REPLACE WITH FAVORITES FETCHING LOGIC
-  const loadMeals = async () => {
-    setLoading(true);
-    const newMeals = await fetchMealsPagination(
-      PAGE_SIZE,
-      (page - 1) * PAGE_SIZE,
-    );
-    if (newMeals.length < PAGE_SIZE) setHasMore(false);
-    setMeals((prev) => [...prev, ...newMeals]);
-    setLoading(false);
-  };
-
-  // Initial + subsequent page fetch
-  useEffect(() => {
-    loadMeals();
-  }, [page]);
-
-  // IntersectionObserver triggers next page
-  useEffect(() => {
-    if (!observerRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    observer.observe(observerRef.current);
-    return () => observer.disconnect();
-  }, [hasMore, loading]);
+  async function handleUnfavorite(mealId: string) {
+    setRemovingIds((prev) => new Set(prev).add(mealId));
+    try {
+      await removeFavorite(userId, mealId);
+      setTimeout(() => removeItem((m) => m.id_meal === mealId), 300);
+    } catch {
+      setRemovingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(mealId);
+        return next;
+      });
+    }
+  }
 
   return (
     <main className="min-h-screen text-white py-12 px-6 sm:px-12">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl sm:text-5xl font-extrabold mb-8 text-center">
-          All Recipes
+          My Favorites
         </h1>
+
+        {meals.length === 0 && !loading && (
+          <p className="text-center text-muted-foreground">
+            No favorites yet. Heart a meal on the recipes page to save it here.
+          </p>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {meals.map((meal) => (
-            <MealCard key={meal.id_meal} meal={meal} />
+            <div
+              key={meal.id_meal}
+              className={`transition-all duration-300 ${
+                removingIds.has(meal.id_meal)
+                  ? "opacity-0 scale-90 pointer-events-none"
+                  : "opacity-100 scale-100"
+              }`}
+            >
+              <MealCard
+                meal={meal}
+                isFavorited={true}
+                onToggleFavorite={handleUnfavorite}
+              />
+            </div>
           ))}
         </div>
 
-        {/* Loader / trigger div */}
         <div ref={observerRef} className="h-10 mt-4 text-center">
-          {loading && <p>Loading more meals...</p>}
-          {!hasMore && <p>No more meals to load.</p>}
+          {loading && <p>Loading favorites...</p>}
+          {!hasMore && meals.length > 0 && <p>All favorites loaded.</p>}
         </div>
       </div>
     </main>
   );
+};
+
+const FavoritesPage = () => {
+  const { session } = useAuth();
+  const userId = session?.user.id;
+
+  if (!userId) {
+    return (
+      <main className="min-h-screen text-white py-12 px-6 sm:px-12">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl font-extrabold mb-8 text-center">
+            My Favorites
+          </h1>
+        </div>
+      </main>
+    );
+  }
+
+  return <FavoritesList userId={userId} />;
 };
 
 export default FavoritesPage;

@@ -1,4 +1,5 @@
-import { fetchMealData, MealData } from "@/lib/supabase/fetch-meals";
+import { fetchMealData } from "@/lib/supabase/fetch-meals";
+import { MealData } from "@/lib/supabase/types";
 import RecipePage from "@/components/meals/RecipePage";
 import { notFound } from "next/navigation";
 

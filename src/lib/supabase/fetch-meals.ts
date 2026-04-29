@@ -1,10 +1,6 @@
 import { supabase } from "./supabase-client";
+import { MealData } from "./types";
 
-export interface MealData {
-  id_meal: number;
-  name: string;
-  image_url: string;
-}
 
 export async function fetchAllMeals(): Promise<MealData[]> {
   const { data, error } = await supabase.from("meals").select("*");
