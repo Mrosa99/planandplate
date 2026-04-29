@@ -2,7 +2,6 @@
 import Image from "next/image";
 import { fetchRandomMeals } from "../lib/supabase/fetch-meals";
 import { MealData } from "../lib/supabase/types";
-import { Link } from "lucide-react";
 
 export default async function HomePage() {
   // Fetch a random meal on the server
@@ -33,18 +32,18 @@ export default async function HomePage() {
             manage your favorites all in one place.
           </p>
           <div className="flex gap-4">
-            <Link
+            <a
               href="/recipes"
               className="px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-orange-700 transition"
             >
               View all meals
-            </Link>
-            <Link
-              href="/trending"
+            </a>
+            <a
+              href="/"
               className="px-6 py-3 border border-primary text-primary font-semibold rounded-lg hover:bg-orange-50 transition"
             >
               View trending meals
-            </Link>
+            </a>
           </div>
         </div>
         <div className="flex-1 relative w-full aspect-4/3 max-h-125 group overflow-hidden rounded-lg shadow-lg">
