@@ -2,17 +2,27 @@
 
 import { useCallback, useState } from "react";
 import MealCard from "@/components/meals/MealCard";
-import { fetchFavoritePagination, removeFavorite } from "@/lib/supabase/favorites";
+import {
+  fetchFavoritePagination,
+  removeFavorite,
+} from "@/lib/supabase/favorites";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import { useAuth } from "@/components/AuthProvider";
 
 const FavoritesList = ({ userId }: { userId: string }) => {
   const fetchFn = useCallback(
-    (limit: number, offset: number) => fetchFavoritePagination(userId, limit, offset),
+    (limit: number, offset: number) =>
+      fetchFavoritePagination(userId, limit, offset),
     [userId],
   );
 
-  const { items: meals, loading, hasMore, observerRef, removeItem } = useInfiniteScroll(fetchFn);
+  const {
+    items: meals,
+    loading,
+    hasMore,
+    observerRef,
+    removeItem,
+  } = useInfiniteScroll(fetchFn);
   const [removingIds, setRemovingIds] = useState<Set<string>>(new Set());
 
   async function handleUnfavorite(mealId: string) {
@@ -63,7 +73,6 @@ const FavoritesList = ({ userId }: { userId: string }) => {
 
         <div ref={observerRef} className="h-10 mt-4 text-center">
           {loading && <p>Loading favorites...</p>}
-          {!hasMore && meals.length > 0 && <p>All favorites loaded.</p>}
         </div>
       </div>
     </main>
