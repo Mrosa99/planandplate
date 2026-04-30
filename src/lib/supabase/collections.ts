@@ -1,5 +1,5 @@
 import { supabase } from "./supabase-client";
-import { CollectionItem } from "./types";
+import { CollectionItem, MealData } from "./types";
 
 export async function fetchCollections(userId: string): Promise<CollectionItem[]> {
   const { data, error } = await supabase
@@ -40,6 +40,36 @@ export async function createCollection(
 
   if (error) throw new Error(error.message ?? "Failed to create collection");
   return data.id;
+}
+
+export async function fetchCollectionMeals(
+  collectionId: string,
+  limit = 20,
+  offset = 0,
+): Promise<MealData[]> {
+  const { data, error } = await supabase
+    .from("collection_meals")
+    .select("meals(id_meal, name, image_url)")
+    .eq("collection_id", collectionId)
+    .order("added_at", { ascending: true })
+    .range(offset, offset + limit - 1);
+
+  if (error) throw new Error(error.message ?? "Failed to fetch collection meals");
+
+  return (data ?? [])
+    .map((row) => row.meals as unknown as MealData)
+    .filter(Boolean);
+}
+
+export async function addMealToCollection(
+  collectionId: string,
+  mealId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("collection_meals")
+    .insert({ collection_id: collectionId, meal_id: mealId });
+
+  if (error) throw new Error(error.message ?? "Failed to add meal to collection");
 }
 
 export async function deleteCollection(collectionId: string): Promise<void> {

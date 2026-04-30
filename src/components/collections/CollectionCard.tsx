@@ -1,16 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
-import { FolderHeart } from "lucide-react";
+import { FolderHeart, Trash2 } from "lucide-react";
 
 interface CollectionCardProps {
   name: string;
   recipeCount: number;
   coverImage?: string;
   href: string;
+  onDelete?: () => void;
 }
 
-export function CollectionCard({ name, recipeCount, coverImage, href }: CollectionCardProps) {
+export function CollectionCard({ name, recipeCount, coverImage, href, onDelete }: CollectionCardProps) {
   return (
+    <div className="relative">
     <Link
       href={href}
       className="group flex flex-col rounded-xl overflow-hidden border bg-card shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
@@ -38,5 +40,15 @@ export function CollectionCard({ name, recipeCount, coverImage, href }: Collecti
         </p>
       </div>
     </Link>
+    {onDelete && (
+      <button
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(); }}
+        className="absolute top-2 right-2 p-1.5 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors shadow-md"
+        aria-label="Delete collection"
+      >
+        <Trash2 className="size-4" />
+      </button>
+    )}
+    </div>
   );
 }

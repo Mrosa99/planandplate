@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import MealCard from "@/components/meals/MealCard";
+import { MealTileCard } from "@/components/meals/MealTileCard";
 import {
   fetchFavoritePagination,
   removeFavorite,
@@ -62,10 +62,9 @@ const FavoritesList = ({ userId }: { userId: string }) => {
                   : "opacity-100 scale-100"
               }`}
             >
-              <MealCard
+              <MealTileCard
                 meal={meal}
-                isFavorited={true}
-                onToggleFavorite={handleUnfavorite}
+                onUnfavorite={handleUnfavorite}
               />
             </div>
           ))}
