@@ -4,6 +4,19 @@ export interface MealData {
   image_url: string;
 }
 
+export interface Ingredient {
+  name: string;
+  measure: string;
+}
+
+export interface MealDetailData extends MealData {
+  instructions?: string;
+  area?: string;
+  id_category?: string;
+  categories?: { category: string } | null;
+  ingredients?: Ingredient[];
+}
+
 export interface Collection {
   id: string;
   user_id: string;
@@ -16,4 +29,14 @@ export interface CollectionItem {
   name: string;
   recipeCount: number;
   coverImage?: string;
+}
+
+export interface UserMeal {
+  id_meal: string;
+  name: string;
+  image_url?: string;
+  category?: string;
+  area?: string;
+  is_public: boolean;
+  ingredientCount: number;
 }

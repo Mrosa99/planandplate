@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Search, ArrowLeft, BookMarked } from "lucide-react";
+import { Plus, Search, ArrowLeft, BookMarked, Pencil, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,9 +12,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DialogClose } from "@/components/ui/dialog";
 import { useSearch } from "@/lib/hooks/use-search";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
-import { addMealToCollection, fetchCollectionMeals } from "@/lib/supabase/collections";
+import {
+  addMealToCollection,
+  fetchCollectionMeals,
+  fetchCollectionName,
+  renameCollection,
+  removeMealFromCollection,
+} from "@/lib/supabase/collections";
 import { MealTileCard } from "@/components/meals/MealTileCard";
 import { MealData } from "@/lib/supabase/types";
 
@@ -23,13 +30,26 @@ export function CollectionDetailPage({ collectionId }: { collectionId: string })
   const [query, setQuery] = useState("");
   const [selectedMeal, setSelectedMeal] = useState<MealData | null>(null);
   const [adding, setAdding] = useState(false);
+
+  const [collectionName, setCollectionName] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null);
+
   const { items: meals, loading, observerRef } = useSearch(query);
 
   const fetchFn = useCallback(
     (limit: number, offset: number) => fetchCollectionMeals(collectionId, limit, offset),
     [collectionId],
   );
-  const { items: collectionMeals, observerRef: gridObserverRef, reset } = useInfiniteScroll(fetchFn);
+  const { items: collectionMeals, observerRef: gridObserverRef, reset, removeItem } = useInfiniteScroll(fetchFn);
+
+  useEffect(() => {
+    fetchCollectionName(collectionId)
+      .then((name) => { setCollectionName(name); setEditName(name); })
+      .catch(() => {});
+  }, [collectionId]);
 
   async function handleAddToCollection() {
     if (!selectedMeal) return;
@@ -59,6 +79,32 @@ export function CollectionDetailPage({ collectionId }: { collectionId: string })
     setSelectedMeal(null);
   }
 
+  async function handleSaveName() {
+    const trimmed = editName.trim();
+    if (!trimmed || trimmed === collectionName) return;
+    setSaving(true);
+    const prev = collectionName;
+    setCollectionName(trimmed);
+    try {
+      await renameCollection(collectionId, trimmed);
+    } catch {
+      setCollectionName(prev);
+      setEditName(prev);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleRemoveMeal(mealId: string) {
+    setPendingRemoveId(null);
+    removeItem((m) => m.id_meal === mealId);
+    try {
+      await removeMealFromCollection(collectionId, mealId);
+    } catch {
+      reset();
+    }
+  }
+
   return (
     <main className="min-h-screen py-12 px-4 sm:px-8">
       <div className="max-w-5xl mx-auto">
@@ -70,11 +116,40 @@ export function CollectionDetailPage({ collectionId }: { collectionId: string })
           ← Back to Collections
         </Link>
 
-        <h1 className="text-3xl font-bold mb-8">Collection</h1>
+        <div className="flex items-center justify-between mb-8">
+          {isEditing ? (
+            <Input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onBlur={handleSaveName}
+              onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+              disabled={saving}
+              className="text-3xl font-bold h-auto py-1 px-2 max-w-sm"
+              autoFocus
+            />
+          ) : (
+            <h1 className="text-3xl font-bold">{collectionName || "Collection"}</h1>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              if (isEditing) handleSaveName();
+              setIsEditing((v) => !v);
+            }}
+          >
+            {isEditing ? <><Check className="size-4" /> Done</> : <><Pencil className="size-4" /> Edit</>}
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {collectionMeals.map((meal) => (
-            <MealTileCard key={meal.id_meal} meal={meal} />
+            <MealTileCard
+              key={meal.id_meal}
+              meal={meal}
+              onRemove={isEditing ? (id) => setPendingRemoveId(id) : undefined}
+            />
           ))}
 
           <button
@@ -171,6 +246,28 @@ export function CollectionDetailPage({ collectionId }: { collectionId: string })
             </>
           )}
 
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!pendingRemoveId} onOpenChange={(o) => { if (!o) setPendingRemoveId(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove from collection?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            This meal will be removed from this collection.
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={() => pendingRemoveId && handleRemoveMeal(pendingRemoveId)}
+            >
+              Remove
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </main>

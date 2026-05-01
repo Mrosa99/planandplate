@@ -1,5 +1,5 @@
 import { supabase } from "./supabase-client";
-import { MealData } from "./types";
+import { MealData, MealDetailData } from "./types";
 
 
 export async function fetchAllMeals(): Promise<MealData[]> {
@@ -26,6 +26,7 @@ export async function fetchMealsPagination(
   const { data, error } = await supabase
     .from("meals")
     .select("*")
+    .eq("is_public", true)
     .range(offset, offset + limit - 1);
 
   if (error) {
@@ -36,10 +37,10 @@ export async function fetchMealsPagination(
   return data || [];
 }
 
-export async function fetchMealData(id: string): Promise<MealData | null> {
+export async function fetchMealData(id: string): Promise<MealDetailData | null> {
   const { data, error } = await supabase
     .from("meals")
-    .select("*")
+    .select("*, categories(category), ingredients(name, measure)")
     .eq("id_meal", id)
     .single();
 
@@ -48,5 +49,5 @@ export async function fetchMealData(id: string): Promise<MealData | null> {
     return null;
   }
 
-  return data as MealData | null;
+  return data as MealDetailData | null;
 }

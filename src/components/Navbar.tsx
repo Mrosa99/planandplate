@@ -206,7 +206,7 @@ const Navbar1 = ({
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/meals" className="flex items-center gap-2 cursor-pointer">
-                        <UtensilsCrossed className="size-4" /> Meals
+                        <UtensilsCrossed className="size-4" /> My Kitchen
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -281,7 +281,7 @@ const Navbar1 = ({
                           {[
                             { href: "/favorites", icon: <Heart className="size-4" />, label: "Favorites" },
                             { href: "/collections", icon: <BookMarked className="size-4" />, label: "Collections" },
-                            { href: "/meals", icon: <UtensilsCrossed className="size-4" />, label: "Meals" },
+                            { href: "/meals", icon: <UtensilsCrossed className="size-4" />, label: "My Kitchen" },
                             { href: "/calendar", icon: <CalendarDays className="size-4" />, label: "Calendar" },
                             { href: "/settings", icon: <Settings className="size-4" />, label: "Settings" },
                           ].map(({ href, icon, label }) => (

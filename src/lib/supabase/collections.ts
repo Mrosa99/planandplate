@@ -80,3 +80,33 @@ export async function deleteCollection(collectionId: string): Promise<void> {
 
   if (error) throw new Error(error.message ?? "Failed to delete collection");
 }
+
+export async function fetchCollectionName(collectionId: string): Promise<string> {
+  const { data, error } = await supabase
+    .from("collections")
+    .select("name")
+    .eq("id", collectionId)
+    .single();
+
+  if (error) throw new Error(error.message ?? "Failed to fetch collection name");
+  return data.name;
+}
+
+export async function renameCollection(collectionId: string, name: string): Promise<void> {
+  const { error } = await supabase
+    .from("collections")
+    .update({ name })
+    .eq("id", collectionId);
+
+  if (error) throw new Error(error.message ?? "Failed to rename collection");
+}
+
+export async function removeMealFromCollection(collectionId: string, mealId: string): Promise<void> {
+  const { error } = await supabase
+    .from("collection_meals")
+    .delete()
+    .eq("collection_id", collectionId)
+    .eq("meal_id", mealId);
+
+  if (error) throw new Error(error.message ?? "Failed to remove meal from collection");
+}
