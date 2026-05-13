@@ -40,7 +40,7 @@ export async function fetchMealsPagination(
 export async function fetchMealData(id: string): Promise<MealDetailData | null> {
   const { data, error } = await supabase
     .from("meals")
-    .select("*, categories(category), ingredients(name, measure)")
+    .select("*, categories(category), areas(area), ingredients(name, measure)")
     .eq("id_meal", id)
     .single();
 

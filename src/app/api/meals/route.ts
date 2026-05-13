@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@/lib/supabase/supabase-client";
 
 const RATE_LIMIT = 10;
 
@@ -7,17 +7,10 @@ export async function POST(req: NextRequest) {
   const token = req.headers.get("authorization")?.replace("Bearer ", "");
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const anonClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_ROLE_KEY!,
-  );
-  const { data: { user }, error: authError } = await anonClient.auth.getUser(token);
-  if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createServerClient(token);
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   // Rate limit: max 10 meals per 24 hours
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -35,7 +28,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { name, image_url, category, area, instructions, ingredients } = body;
+  const { name, image_url, category, area, instructions, ingredients, is_public } = body;
 
   if (!name?.trim()) return NextResponse.json({ error: "Name is required" }, { status: 400 });
 
@@ -50,7 +43,18 @@ export async function POST(req: NextRequest) {
     id_category = catData?.id_category;
   }
 
-  // Insert meal
+  // Upsert area if provided
+  let id_area: string | undefined;
+  if (area?.trim()) {
+    const { data: areaData } = await supabase
+      .from("areas")
+      .upsert({ area: area.trim() }, { onConflict: "area" })
+      .select("id_area")
+      .single();
+    id_area = areaData?.id_area;
+  }
+
+  // Insert meal — RLS INSERT policy enforces user_id = auth.uid()
   const { data: mealData, error: mealError } = await supabase
     .from("meals")
     .insert({
@@ -58,9 +62,9 @@ export async function POST(req: NextRequest) {
       name: name.trim(),
       image_url: image_url?.trim() || null,
       instructions: instructions?.trim() || null,
-      area: area?.trim() || null,
+      id_area: id_area ?? null,
       id_category: id_category ?? null,
-      is_public: false,
+      is_public: is_public === true,
     })
     .select("id_meal")
     .single();

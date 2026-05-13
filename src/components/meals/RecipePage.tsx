@@ -25,20 +25,25 @@ export default function RecipePage({ meal }: Props) {
   }
 
   const category = meal.categories?.category;
+  const area = meal.areas?.area;
 
   return (
     <div className="w-full max-w-4xl mx-auto pb-20 flex flex-col gap-8">
 
       {/* Hero + title */}
       <div className="flex flex-col md:flex-row gap-8 items-start">
-        <div className="relative w-full md:w-96 aspect-square shrink-0 rounded-2xl overflow-hidden">
-          <Image
-            src={meal.image_url}
-            alt={meal.name}
-            fill
-            className="object-cover"
-            priority
-          />
+        <div className="relative w-full md:w-96 aspect-square shrink-0 rounded-2xl overflow-hidden bg-muted flex items-center justify-center">
+          {meal.image_url ? (
+            <Image
+              src={meal.image_url}
+              alt={meal.name}
+              fill
+              className="object-cover"
+              priority
+            />
+          ) : (
+            <span className="text-muted-foreground/30 text-6xl select-none">🍽️</span>
+          )}
         </div>
 
         <div className="flex flex-col gap-3 pt-2">
@@ -48,9 +53,9 @@ export default function RecipePage({ meal }: Props) {
                 {category}
               </span>
             )}
-            {meal.area && (
+            {area && (
               <span className="text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full border bg-muted text-muted-foreground">
-                {meal.area}
+                {area}
               </span>
             )}
           </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, UtensilsCrossed, Trash2, Globe, Lock } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/components/AuthProvider";
 import { fetchUserCreatedMeals, toggleMealVisibility, deleteUserMeal } from "@/lib/supabase/user-meals";
 import { CreateMealDialog } from "@/components/meals/CreateMealDialog";
@@ -16,16 +17,29 @@ export function MyKitchenPage() {
 
   const [meals, setMeals] = useState<UserMeal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [pendingPublishId, setPendingPublishId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterArea, setFilterArea] = useState("");
 
   useEffect(() => {
     if (!userId) { setLoading(false); return; }
     fetchUserCreatedMeals(userId)
       .then(setMeals)
+      .catch((err) => setFetchError(err?.message ?? "Failed to load meals"))
       .finally(() => setLoading(false));
   }, [userId]);
+
+  const filteredMeals = meals.filter((m) =>
+    (!filterCategory || m.category === filterCategory) &&
+    (!filterArea || m.area === filterArea),
+  );
+
+  const mealCategories = Array.from(new Set(meals.map((m) => m.category).filter(Boolean))) as string[];
+  const mealAreas = Array.from(new Set(meals.map((m) => m.area).filter(Boolean))) as string[];
 
   async function handleToggleVisibility(meal: UserMeal) {
     setTogglingId(meal.id_meal);
@@ -66,7 +80,48 @@ export function MyKitchenPage() {
           </Button>
         </div>
 
+        {/* Filters */}
+        {meals.length > 0 && (
+          <div className="flex flex-wrap gap-3 mb-6">
+            <Select value={filterCategory || "__all__"} onValueChange={(v) => setFilterCategory(v === "__all__" ? "" : v)}>
+              <SelectTrigger className="w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">All Categories</SelectItem>
+                {mealCategories.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterArea || "__all__"} onValueChange={(v) => setFilterArea(v === "__all__" ? "" : v)}>
+              <SelectTrigger className="w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">All Cuisines</SelectItem>
+                {mealAreas.map((a) => (
+                  <SelectItem key={a} value={a}>{a}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(filterCategory || filterArea) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setFilterCategory(""); setFilterArea(""); }}
+              >
+                Clear filters
+              </Button>
+            )}
+          </div>
+        )}
+
         {loading && <p className="text-muted-foreground text-sm">Loading...</p>}
+
+        {fetchError && (
+          <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2 mb-4">{fetchError}</p>
+        )}
 
         {!loading && meals.length === 0 && (
           <div className="flex flex-col items-center justify-center mt-24 gap-4 text-center">
@@ -83,8 +138,12 @@ export function MyKitchenPage() {
           </div>
         )}
 
+        {!loading && meals.length > 0 && filteredMeals.length === 0 && (
+          <p className="text-sm text-muted-foreground mt-8 text-center">No meals match the selected filters.</p>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {meals.map((meal) => (
+          {filteredMeals.map((meal) => (
             <div key={meal.id_meal} className="group relative flex flex-col rounded-xl overflow-hidden border bg-card shadow-sm hover:shadow-md transition-all duration-200">
 
               {/* Image */}
@@ -129,7 +188,7 @@ export function MyKitchenPage() {
 
                 {/* Publish toggle */}
                 <button
-                  onClick={() => handleToggleVisibility(meal)}
+                  onClick={() => meal.is_public ? handleToggleVisibility(meal) : setPendingPublishId(meal.id_meal)}
                   disabled={togglingId === meal.id_meal}
                   className={`flex items-center gap-1.5 self-start text-xs font-medium px-2.5 py-1 rounded-full border transition-colors ${
                     meal.is_public
@@ -156,6 +215,29 @@ export function MyKitchenPage() {
           onOpenChange={setOpen}
           onCreated={(meal) => setMeals((prev) => [meal, ...prev])}
         />
+      )}
+
+      {pendingPublishId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-card rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 flex flex-col gap-4">
+            <div>
+              <p className="font-semibold">Make this meal public?</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Everyone will be able to see this meal in search and browse. You can make it private again at any time.
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setPendingPublishId(null)}>Cancel</Button>
+              <Button onClick={() => {
+                const meal = meals.find((m) => m.id_meal === pendingPublishId);
+                if (meal) handleToggleVisibility(meal);
+                setPendingPublishId(null);
+              }}>
+                Yes, publish
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
 
       {pendingDeleteId && (

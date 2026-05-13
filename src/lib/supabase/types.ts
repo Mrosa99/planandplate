@@ -11,9 +11,9 @@ export interface Ingredient {
 
 export interface MealDetailData extends MealData {
   instructions?: string;
-  area?: string;
   id_category?: string;
   categories?: { category: string } | null;
+  areas?: { area: string } | null;
   ingredients?: Ingredient[];
 }
 

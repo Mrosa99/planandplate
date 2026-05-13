@@ -4,7 +4,7 @@ import { UserMeal } from "./types";
 export async function fetchUserCreatedMeals(userId: string): Promise<UserMeal[]> {
   const { data, error } = await supabase
     .from("meals")
-    .select("id_meal, name, image_url, area, is_public, categories(category), ingredients(meal_id)")
+    .select("id_meal, name, image_url, is_public, categories(category), areas(area), ingredients(meal_id)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
@@ -13,8 +13,8 @@ export async function fetchUserCreatedMeals(userId: string): Promise<UserMeal[]>
   return (data ?? []).map((m) => ({
     id_meal: m.id_meal,
     name: m.name,
-    image_url: m.image_url ?? undefined,
-    area: m.area ?? undefined,
+    image_url: m.image_url || undefined,
+    area: (m.areas as unknown as { area: string } | null)?.area ?? undefined,
     is_public: m.is_public ?? false,
     category: (m.categories as unknown as { category: string } | null)?.category,
     ingredientCount: Array.isArray(m.ingredients) ? m.ingredients.length : 0,

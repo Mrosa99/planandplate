@@ -15,13 +15,19 @@ const MealCard = ({ meal, isFavorited, onToggleFavorite }: Props) => {
       href={`/recipes/${meal.id_meal}`}
       className="relative block h-72 rounded-2xl overflow-hidden group hover:scale-[1.02] transition-transform duration-300"
     >
-      <Image
-        src={meal.image_url}
-        alt={meal.name}
-        fill
-        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-        className="object-cover"
-      />
+      {meal.image_url ? (
+        <Image
+          src={meal.image_url}
+          alt={meal.name}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground/30 text-5xl select-none">🍽️</span>
+        </div>
+      )}
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
 
