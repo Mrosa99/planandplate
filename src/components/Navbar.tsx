@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { Logout } from "@/lib/supabase/user-auth";
+import { fetchRandomMeals } from "@/lib/supabase/fetch-meals";
 
 import {
   Accordion,
@@ -57,6 +58,7 @@ interface MenuItem {
   icon?: React.ReactNode;
   items?: MenuItem[];
   requiresAuth?: boolean;
+  onClick?: () => void;
 }
 
 interface Navbar1Props {
@@ -87,7 +89,23 @@ const Navbar1 = ({
     alt: "logo",
     title: "Plan and Plate",
   },
-  menu = [
+  menu,
+  auth = {
+    login: { title: "Login", url: "/auth/login" },
+    signup: { title: "Sign up", url: "/auth/signup" },
+    logout: { title: "Logout" },
+  },
+}: Navbar1Props) => {
+  const { session } = useAuth();
+  const router = useRouter();
+  const isAuthenticated = !!session;
+
+  async function handleRandomRecipe() {
+    const meals = await fetchRandomMeals(1).catch(() => []);
+    if (meals[0]) router.push(`/recipes/${meals[0].id_meal}`);
+  }
+
+  const defaultMenu: MenuItem[] = [
     { title: "Home", url: "/" },
     {
       title: "Recipes",
@@ -102,26 +120,27 @@ const Navbar1 = ({
         {
           title: "Trending",
           description: "Recipes that are getting the most attention right now.",
-          icon: <Book className="size-5 shrink-0" />,
-          url: "/recipes",
+          icon: <Zap className="size-5 shrink-0" />,
+          url: "/recipes?sort=trending",
         },
         {
           title: "Most Saved",
           description: "The recipes users love and save the most.",
           icon: <Trees className="size-5 shrink-0" />,
-          url: "/recipes",
+          url: "/recipes?sort=most_saved",
         },
         {
           title: "New Recipes",
           description: "The latest additions fresh from the recipe feed.",
           icon: <Sunset className="size-5 shrink-0" />,
-          url: "/recipes",
+          url: "/recipes?sort=latest",
         },
         {
           title: "Random Recipe",
           description: "Get a surprise recipe with one click.",
-          icon: <Zap className="size-5 shrink-0" />,
-          url: "/recipes",
+          icon: <Book className="size-5 shrink-0" />,
+          url: "#",
+          onClick: handleRandomRecipe,
         },
       ],
     },
@@ -134,20 +153,13 @@ const Navbar1 = ({
       title: "Search",
       url: "/search",
     },
-  ],
-  auth = {
-    login: { title: "Login", url: "/auth/login" },
-    signup: { title: "Sign up", url: "/auth/signup" },
-    logout: { title: "Logout" },
-  },
-}: Navbar1Props) => {
-  const { session } = useAuth();
-  const router = useRouter();
-  const isAuthenticated = !!session;
+  ];
+
+  const resolvedMenu = menu ?? defaultMenu;
 
   const getInitials = (email: string) => email.slice(0, 2).toUpperCase();
 
-  const visibleMenu = menu.filter(
+  const visibleMenu = resolvedMenu.filter(
     (item) => !item.requiresAuth || isAuthenticated,
   );
 
@@ -371,11 +383,9 @@ const renderMobileMenuItem = (item: MenuItem) => {
 };
 
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
-  return (
-    <Link
-      className="flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
-      href={item.url}
-    >
+  const className = "flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground w-full text-left";
+  const content = (
+    <>
       <div className="text-foreground">{item.icon}</div>
       <div>
         <div className="text-sm font-semibold">{item.title}</div>
@@ -385,6 +395,20 @@ const SubMenuLink = ({ item }: { item: MenuItem }) => {
           </p>
         )}
       </div>
+    </>
+  );
+
+  if (item.onClick) {
+    return (
+      <button className={className} onClick={item.onClick}>
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link className={className} href={item.url}>
+      {content}
     </Link>
   );
 };
