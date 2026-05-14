@@ -1,7 +1,7 @@
 // app/page.tsx
 import Image from "next/image";
-import { fetchRandomMeals } from "../lib/supabase/fetchMealsFromSupabase";
-import { MealData } from "../lib/supabase/fetchMealsFromSupabase";
+import { fetchRandomMeals } from "../lib/supabase/fetch-meals";
+import { MealData } from "../lib/supabase/types";
 
 export default async function HomePage() {
   // Fetch a random meal on the server
@@ -33,7 +33,7 @@ export default async function HomePage() {
           </p>
           <div className="flex gap-4">
             <a
-              href="/"
+              href="/recipes"
               className="px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-orange-700 transition"
             >
               View all meals
@@ -42,7 +42,7 @@ export default async function HomePage() {
               href="/"
               className="px-6 py-3 border border-primary text-primary font-semibold rounded-lg hover:bg-orange-50 transition"
             >
-              View favorites
+              View trending meals
             </a>
           </div>
         </div>
@@ -52,6 +52,7 @@ export default async function HomePage() {
               src={mealData[0].image_url}
               alt={mealData[0].name}
               fill
+              sizes="(max-width: 640px) 100vw, 50vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
@@ -69,7 +70,7 @@ export default async function HomePage() {
         </h3>
         <p className="text-gray-700 text-lg sm:text-xl leading-relaxed">
           Plan & Plate is a simple platform to help you explore meals, discover
-          new recipes, and manage your favorites. Whether you’re cooking for
+          new recipes, and manage your favorites. Whether you`re cooking for
           yourself or your family, we provide inspiration for every occasion.
         </p>
       </section>
@@ -86,6 +87,7 @@ export default async function HomePage() {
                 src={mealData[1].image_url}
                 alt={mealData[1].name}
                 fill
+                sizes="(max-width: 640px) 100vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
@@ -107,6 +109,7 @@ export default async function HomePage() {
                 src={mealData[2].image_url}
                 alt={mealData[2].name}
                 fill
+                sizes="(max-width: 640px) 100vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
@@ -128,6 +131,7 @@ export default async function HomePage() {
                 src={mealData[3].image_url}
                 alt={mealData[3].name}
                 fill
+                sizes="(max-width: 640px) 100vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />

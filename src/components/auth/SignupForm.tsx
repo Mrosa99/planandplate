@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { signup } from "@/lib/register";
+import { Signup } from "@/lib/supabase/user-auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter as useNextRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export function SignupForm({
   className,
@@ -21,7 +21,7 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const nextRouter = typeof window !== "undefined" ? useNextRouter() : null;
+  const router = useRouter();
 
   async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -30,11 +30,9 @@ export function SignupForm({
 
     const form = e.currentTarget;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const password = (form.elements.namedItem("password") as HTMLInputElement)
-      .value;
-    const confirmPassword = (
-      form.elements.namedItem("confirmPassword") as HTMLInputElement
-    ).value;
+    const username = (form.elements.namedItem("username") as HTMLInputElement).value.trim();
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+    const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement).value;
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -43,10 +41,9 @@ export function SignupForm({
     }
 
     try {
-      await signup(email, password);
+      await Signup(email, password, username);
 
-      // Redirect after signup
-      nextRouter?.replace("/");
+      router.replace("/");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Signup failed");
     } finally {
@@ -73,6 +70,17 @@ export function SignupForm({
                   name="email"
                   type="email"
                   placeholder="me@example.com"
+                  required
+                />
+              </div>
+
+              <div className="grid gap-3">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  name="username"
+                  type="text"
+                  placeholder="johndoe"
                   required
                 />
               </div>

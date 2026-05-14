@@ -2,8 +2,8 @@
 
 import {
   Book,
+  BookMarked,
   CalendarDays,
-  Clock,
   Heart,
   LogOut,
   Menu,
@@ -15,8 +15,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/supabaseClient";
-import { useAuthSession } from "@/lib/supabase/useAuthSession";
+import { useAuth } from "@/components/AuthProvider";
+import { Logout } from "@/lib/supabase/user-auth";
+import { fetchRandomMeals } from "@/lib/supabase/fetch-meals";
 
 import {
   Accordion,
@@ -32,6 +33,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import {
   Sheet,
@@ -56,6 +58,7 @@ interface MenuItem {
   icon?: React.ReactNode;
   items?: MenuItem[];
   requiresAuth?: boolean;
+  onClick?: () => void;
 }
 
 interface Navbar1Props {
@@ -86,7 +89,23 @@ const Navbar1 = ({
     alt: "logo",
     title: "Plan and Plate",
   },
-  menu = [
+  menu,
+  auth = {
+    login: { title: "Login", url: "/auth/login" },
+    signup: { title: "Sign up", url: "/auth/signup" },
+    logout: { title: "Logout" },
+  },
+}: Navbar1Props) => {
+  const { session } = useAuth();
+  const router = useRouter();
+  const isAuthenticated = !!session;
+
+  async function handleRandomRecipe() {
+    const meals = await fetchRandomMeals(1).catch(() => []);
+    if (meals[0]) router.push(`/recipes/${meals[0].id_meal}`);
+  }
+
+  const defaultMenu: MenuItem[] = [
     { title: "Home", url: "/" },
     {
       title: "Recipes",
@@ -101,26 +120,27 @@ const Navbar1 = ({
         {
           title: "Trending",
           description: "Recipes that are getting the most attention right now.",
-          icon: <Book className="size-5 shrink-0" />,
-          url: "/recipes",
+          icon: <Zap className="size-5 shrink-0" />,
+          url: "/recipes?sort=trending",
         },
         {
           title: "Most Saved",
           description: "The recipes users love and save the most.",
           icon: <Trees className="size-5 shrink-0" />,
-          url: "/recipes",
+          url: "/recipes?sort=most_saved",
         },
         {
           title: "New Recipes",
           description: "The latest additions fresh from the recipe feed.",
           icon: <Sunset className="size-5 shrink-0" />,
-          url: "/recipes",
+          url: "/recipes?sort=latest",
         },
         {
           title: "Random Recipe",
           description: "Get a surprise recipe with one click.",
-          icon: <Zap className="size-5 shrink-0" />,
-          url: "/recipes",
+          icon: <Book className="size-5 shrink-0" />,
+          url: "#",
+          onClick: handleRandomRecipe,
         },
       ],
     },
@@ -131,27 +151,20 @@ const Navbar1 = ({
     },
     {
       title: "Search",
-      url: "#",
+      url: "/search",
     },
-  ],
-  auth = {
-    login: { title: "Login", url: "/auth/login" },
-    signup: { title: "Sign up", url: "/auth/signup" },
-    logout: { title: "Logout" },
-  },
-}: Navbar1Props) => {
-  const { session } = useAuthSession();
-  const router = useRouter();
-  const isAuthenticated = !!session;
+  ];
+
+  const resolvedMenu = menu ?? defaultMenu;
 
   const getInitials = (email: string) => email.slice(0, 2).toUpperCase();
 
-  const visibleMenu = menu.filter(
+  const visibleMenu = resolvedMenu.filter(
     (item) => !item.requiresAuth || isAuthenticated,
   );
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await Logout();
     router.push("/");
   };
 
@@ -199,13 +212,13 @@ const Navbar1 = ({
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/history" className="flex items-center gap-2 cursor-pointer">
-                        <Clock className="size-4" /> History
+                      <Link href="/collections" className="flex items-center gap-2 cursor-pointer">
+                        <BookMarked className="size-4" /> Collections
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/meals" className="flex items-center gap-2 cursor-pointer">
-                        <UtensilsCrossed className="size-4" /> Meals
+                        <UtensilsCrossed className="size-4" /> My Kitchen
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -279,8 +292,8 @@ const Navbar1 = ({
                         <div className="flex flex-col gap-1">
                           {[
                             { href: "/favorites", icon: <Heart className="size-4" />, label: "Favorites" },
-                            { href: "/history", icon: <Clock className="size-4" />, label: "History" },
-                            { href: "/meals", icon: <UtensilsCrossed className="size-4" />, label: "Meals" },
+                            { href: "/collections", icon: <BookMarked className="size-4" />, label: "Collections" },
+                            { href: "/meals", icon: <UtensilsCrossed className="size-4" />, label: "My Kitchen" },
                             { href: "/calendar", icon: <CalendarDays className="size-4" />, label: "Calendar" },
                             { href: "/settings", icon: <Settings className="size-4" />, label: "Settings" },
                           ].map(({ href, icon, label }) => (
@@ -337,14 +350,9 @@ const renderMenuItem = (item: MenuItem) => {
 
   return (
     <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink asChild>
-        <Link
-          href={item.url}
-          className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-accent-foreground"
-        >
-          {item.title}
-        </Link>
-      </NavigationMenuLink>
+      <Link href={item.url} className={navigationMenuTriggerStyle()}>
+        {item.title}
+      </Link>
     </NavigationMenuItem>
   );
 };
@@ -375,11 +383,9 @@ const renderMobileMenuItem = (item: MenuItem) => {
 };
 
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
-  return (
-    <Link
-      className="flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
-      href={item.url}
-    >
+  const className = "flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground w-full text-left";
+  const content = (
+    <>
       <div className="text-foreground">{item.icon}</div>
       <div>
         <div className="text-sm font-semibold">{item.title}</div>
@@ -389,6 +395,20 @@ const SubMenuLink = ({ item }: { item: MenuItem }) => {
           </p>
         )}
       </div>
+    </>
+  );
+
+  if (item.onClick) {
+    return (
+      <button className={className} onClick={item.onClick}>
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link className={className} href={item.url}>
+      {content}
     </Link>
   );
 };

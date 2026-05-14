@@ -1,10 +1,6 @@
-import { supabase } from "./supabaseClient";
+import { supabase } from "./supabase-client";
+import { MealData, MealDetailData } from "./types";
 
-export interface MealData {
-  id_meal: number;
-  name: string;
-  image_url: string;
-}
 
 export async function fetchAllMeals(): Promise<MealData[]> {
   const { data, error } = await supabase.from("meals").select("*");
@@ -26,10 +22,14 @@ export async function fetchRandomMeals(count: number): Promise<MealData[]> {
 export async function fetchMealsPagination(
   limit = 20,
   offset = 0,
+  sort: "latest" | "most_saved" = "latest",
 ): Promise<MealData[]> {
+  const column = sort === "most_saved" ? "save_count" : "created_at";
   const { data, error } = await supabase
     .from("meals")
     .select("*")
+    .eq("is_public", true)
+    .order(column, { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) {
@@ -40,10 +40,22 @@ export async function fetchMealsPagination(
   return data || [];
 }
 
-export async function fetchMealData(id: string): Promise<MealData | null> {
+export async function fetchTrendingMeals(limit: number, offset: number): Promise<MealData[]> {
+  const { data, error } = await supabase
+    .rpc("get_trending_meals", { p_limit: limit, p_offset: offset });
+
+  if (error) {
+    console.error("Supabase fetchTrending error:", error);
+    return [];
+  }
+
+  return (data ?? []) as MealData[];
+}
+
+export async function fetchMealData(id: string): Promise<MealDetailData | null> {
   const { data, error } = await supabase
     .from("meals")
-    .select("*")
+    .select("*, categories(category), areas(area), ingredients(name, measure)")
     .eq("id_meal", id)
     .single();
 
@@ -52,5 +64,5 @@ export async function fetchMealData(id: string): Promise<MealData | null> {
     return null;
   }
 
-  return data as MealData | null;
+  return data as MealDetailData | null;
 }

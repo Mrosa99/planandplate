@@ -1,75 +1,108 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import MealCard from "@/components/MealCard";
-import {
-  MealData,
-  fetchMealsPagination,
-} from "@/lib/supabase/fetchMealsFromSupabase";
+import { Suspense, useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
+import MealCard from "@/components/meals/MealCard";
+import { fetchMealsPagination, fetchTrendingMeals } from "@/lib/supabase/fetch-meals";
+import { fetchFavoriteMealIds, addFavorite, removeFavorite } from "@/lib/supabase/favorites";
+import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
+import { useAuth } from "@/components/AuthProvider";
 
-const PAGE_SIZE = 20;
+type SortKey = "latest" | "most_saved" | "trending";
 
-const RecipesPage = () => {
-  const [meals, setMeals] = useState<MealData[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+const SORT_LABELS: Record<SortKey, string> = {
+  latest: "New Recipes",
+  most_saved: "Most Saved",
+  trending: "Trending",
+};
 
-  const observerRef = useRef<HTMLDivElement | null>(null);
+function RecipesContent() {
+  const { session } = useAuth();
+  const userId = session?.user.id;
+  const searchParams = useSearchParams();
 
-  // Fetch meals per page
-  const loadMeals = async () => {
-    setLoading(true);
-    const newMeals = await fetchMealsPagination(
-      PAGE_SIZE,
-      (page - 1) * PAGE_SIZE,
-    );
-    if (newMeals.length < PAGE_SIZE) setHasMore(false);
-    setMeals((prev) => [...prev, ...newMeals]);
-    setLoading(false);
-  };
+  const rawSort = searchParams.get("sort") ?? "latest";
+  const sort: SortKey = rawSort === "trending" || rawSort === "most_saved" ? rawSort : "latest";
 
-  // Initial + subsequent page fetch
+  const fetchFn = useCallback(
+    (limit: number, offset: number) =>
+      sort === "trending"
+        ? fetchTrendingMeals(limit, offset)
+        : fetchMealsPagination(limit, offset, sort),
+    [sort],
+  );
+
+  const { items: meals, loading, hasMore, observerRef, reset } = useInfiniteScroll(fetchFn);
+
   useEffect(() => {
-    loadMeals();
-  }, [page]);
+    reset();
+  // reset is stable (useCallback with no deps), sort drives the re-fetch
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sort]);
 
-  // IntersectionObserver triggers next page
+  const [favoritedIds, setFavoritedIds] = useState<Set<string>>(new Set());
+
   useEffect(() => {
-    if (!observerRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    observer.observe(observerRef.current);
-    return () => observer.disconnect();
-  }, [hasMore, loading]);
+    if (!userId) return;
+    fetchFavoriteMealIds(userId).then(setFavoritedIds).catch(() => {});
+  }, [userId]);
+
+  async function handleToggleFavorite(mealId: string) {
+    if (!userId) return;
+    const isFav = favoritedIds.has(mealId);
+
+    setFavoritedIds((prev) => {
+      const next = new Set(prev);
+      isFav ? next.delete(mealId) : next.add(mealId);
+      return next;
+    });
+
+    try {
+      isFav ? await removeFavorite(userId, mealId) : await addFavorite(userId, mealId);
+    } catch {
+      setFavoritedIds((prev) => {
+        const next = new Set(prev);
+        isFav ? next.add(mealId) : next.delete(mealId);
+        return next;
+      });
+    }
+  }
+
+  const title = sort === "latest" ? "All Recipes" : SORT_LABELS[sort];
 
   return (
     <main className="min-h-screen text-white py-12 px-6 sm:px-12">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl sm:text-5xl font-extrabold mb-8 text-center">
-          All Recipes
+          {title}
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {meals.map((meal) => (
-            <MealCard key={meal.id_meal} meal={meal} />
+            <MealCard
+              key={meal.id_meal}
+              meal={meal}
+              isFavorited={favoritedIds.has(meal.id_meal)}
+              onToggleFavorite={handleToggleFavorite}
+            />
           ))}
         </div>
 
-        {/* Loader / trigger div */}
         <div ref={observerRef} className="h-10 mt-4 text-center">
-          {loading && <p>Loading more meals...</p>}
-          {!hasMore && <p>No more meals to load.</p>}
+          {loading && <p>Loading more recipes...</p>}
+          {!loading && meals.length === 0 && (
+            <p className="text-muted-foreground mt-12">No recipes found.</p>
+          )}
         </div>
       </div>
     </main>
   );
-};
+}
+
+const RecipesPage = () => (
+  <Suspense>
+    <RecipesContent />
+  </Suspense>
+);
 
 export default RecipesPage;
