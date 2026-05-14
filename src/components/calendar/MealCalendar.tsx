@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Search, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useSearch } from "@/lib/hooks/use-search";
 
 type MealType = "Breakfast" | "Lunch" | "Dinner" | "Snack";
 
@@ -53,6 +54,9 @@ export function MealCalendar() {
   const [formType, setFormType]   = useState<MealType>("Breakfast");
   const [formName, setFormName]   = useState("");
   const [formNotes, setFormNotes] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  const { items: searchResults, loading: searchLoading, observerRef: searchObserverRef } = useSearch(formName);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -173,15 +177,19 @@ export function MealCalendar() {
           const dateKey    = toDateKey(year, month, day);
           const dayEntries = entries.filter(e => e.date === dateKey);
           const isToday    = dateKey === todayKey;
+          const isPast     = dateKey < todayKey;
+          const isDisabled = isPast && dayEntries.length === 0;
 
           return (
             <div
               key={i}
-              onClick={() => openDay(dateKey)}
-              className={`min-h-[90px] p-1.5 rounded-lg border cursor-pointer transition-colors select-none
-                ${isToday
-                  ? "border-primary bg-primary/10"
-                  : "border-border bg-card hover:bg-accent/40"
+              onClick={isDisabled ? undefined : () => openDay(dateKey)}
+              className={`min-h-[90px] p-1.5 rounded-lg border transition-colors select-none
+                ${isDisabled
+                  ? "border-border bg-card opacity-35 cursor-default"
+                  : isToday
+                    ? "border-primary bg-primary/10 cursor-pointer"
+                    : "border-border bg-card hover:bg-accent/40 cursor-pointer"
                 }`}
             >
               <span
@@ -270,13 +278,44 @@ export function MealCalendar() {
 
             <div className="space-y-1">
               <Label htmlFor="meal-name">Meal name</Label>
-              <Input
-                id="meal-name"
-                placeholder="e.g. Grilled Salmon"
-                value={formName}
-                onChange={e => setFormName(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && addEntry()}
-              />
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="meal-name"
+                  className="pl-9"
+                  placeholder="Search or type a meal name..."
+                  value={formName}
+                  onChange={e => setFormName(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
+                  onKeyDown={e => e.key === "Enter" && addEntry()}
+                  autoComplete="off"
+                />
+              </div>
+              {searchFocused && formName.trim().length > 0 && (
+                <div className="max-h-48 overflow-y-auto flex flex-col gap-0.5 rounded-md border bg-popover shadow-md mt-1">
+                  {searchLoading && (
+                    <p className="text-xs text-muted-foreground text-center py-4">Searching...</p>
+                  )}
+                  {!searchLoading && searchResults.length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-4">No results — your typed name will be used.</p>
+                  )}
+                  {searchResults.map((meal) => (
+                    <button
+                      key={meal.id_meal}
+                      type="button"
+                      onMouseDown={() => setFormName(meal.name)}
+                      className="flex items-center gap-3 px-3 py-2 hover:bg-muted transition-colors text-left w-full"
+                    >
+                      {meal.image_url && (
+                        <img src={meal.image_url} alt={meal.name} className="size-8 rounded object-cover shrink-0" />
+                      )}
+                      <span className="text-sm font-medium truncate">{meal.name}</span>
+                    </button>
+                  ))}
+                  <div ref={searchObserverRef} className="h-1" />
+                </div>
+              )}
             </div>
 
             <div className="space-y-1">
