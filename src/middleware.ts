@@ -12,6 +12,13 @@ const PROTECTED_PREFIXES = [
 ];
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix)
+  );
+
+  if (!isProtected) return NextResponse.next({ request });
+
   const response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -32,15 +39,9 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Refreshes the session and writes updated cookies to the response.
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
-  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
-    pathname.startsWith(prefix)
-  );
-
-  if (isProtected && !user) {
+  if (!user) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/auth/login";
     return NextResponse.redirect(loginUrl);
