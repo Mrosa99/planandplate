@@ -150,7 +150,9 @@ export function MyKitchenPage() {
               <Link href={`/recipes/${meal.id_meal}`} className="block">
                 <div className="relative h-40 w-full bg-muted flex items-center justify-center">
                   {meal.image_url ? (
-                    <img src={meal.image_url} alt={meal.name} className="w-full h-full object-cover" />
+                    meal.image_url.startsWith("http")
+                      ? <img src={meal.image_url} alt={meal.name} className="w-full h-full object-cover" />
+                      : <span className="text-5xl select-none">{meal.image_url}</span>
                   ) : (
                     <UtensilsCrossed className="size-10 text-muted-foreground/30" />
                   )}

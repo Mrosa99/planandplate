@@ -44,7 +44,11 @@ export function CollectionsPage() {
   }, [userId]);
 
   async function handleDelete(id: string) {
-    setCollections((prev) => prev.filter((c) => c.id !== id));
+    setCollections((prev) => {
+      const next = prev.filter((c) => c.id !== id);
+      if (next.length === 0) setIsEditing(false);
+      return next;
+    });
     try {
       await deleteCollection(id);
     } catch {
@@ -93,21 +97,23 @@ export function CollectionsPage() {
                   <Plus className="size-4" /> New Collection
                 </Button>
               </DialogTrigger>
-              <Button
-                variant="outline"
-                className="gap-2"
-                onClick={() => setIsEditing((v) => !v)}
-              >
-                {isEditing ? (
-                  <>
-                    <Check className="size-4" /> Done
-                  </>
-                ) : (
-                  <>
-                    <Pencil className="size-4" /> Edit
-                  </>
-                )}
-              </Button>
+              {collections.length > 0 && (
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => setIsEditing((v) => !v)}
+                >
+                  {isEditing ? (
+                    <>
+                      <Check className="size-4" /> Done
+                    </>
+                  ) : (
+                    <>
+                      <Pencil className="size-4" /> Edit
+                    </>
+                  )}
+                </Button>
+              )}
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>New Collection</DialogTitle>

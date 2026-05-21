@@ -13,6 +13,7 @@ import {
   UtensilsCrossed,
   Zap,
 } from "lucide-react";
+import { toast } from "sonner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
@@ -96,7 +97,19 @@ const Navbar1 = ({
     logout: { title: "Logout" },
   },
 }: Navbar1Props) => {
-  const { session } = useAuth();
+  const { session, avatar } = useAuth();
+
+  const AVATARS: Record<string, { emoji: string; bg: string }> = {
+    chef:  { emoji: "👨‍🍳", bg: "bg-orange-400" },
+    bowl:  { emoji: "🍜", bg: "bg-yellow-400" },
+    salad: { emoji: "🥗", bg: "bg-green-400" },
+    pizza: { emoji: "🍕", bg: "bg-red-400" },
+    taco:  { emoji: "🌮", bg: "bg-amber-400" },
+    sushi: { emoji: "🍱", bg: "bg-blue-400" },
+    cake:  { emoji: "🎂", bg: "bg-pink-400" },
+    fruit: { emoji: "🍓", bg: "bg-rose-400" },
+  };
+  const selectedAvatar = avatar ? AVATARS[avatar] : null;
   const router = useRouter();
   const isAuthenticated = !!session;
 
@@ -165,6 +178,7 @@ const Navbar1 = ({
 
   const handleLogout = async () => {
     await Logout();
+    toast.success("Logged out successfully");
     router.push("/");
   };
 
@@ -193,13 +207,13 @@ const Navbar1 = ({
             {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-full w-9 h-9 p-0 font-semibold"
+                    <button
+                      className={`rounded-full w-9 h-9 p-0 flex items-center justify-center text-lg font-semibold border border-border ${selectedAvatar ? selectedAvatar.bg : "bg-background"}`}
                     >
-                      {session ? getInitials(session.user.email ?? "?") : "?"}
-                    </Button>
+                      {selectedAvatar
+                        ? selectedAvatar.emoji
+                        : session ? getInitials(session.user.email ?? "?") : "?"}
+                    </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52">
                     <DropdownMenuLabel className="text-muted-foreground text-xs truncate">
