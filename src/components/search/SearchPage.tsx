@@ -76,7 +76,7 @@ export function SearchPage() {
               key={meal.id_meal}
               meal={meal}
               isFavorited={favoritedIds.has(meal.id_meal)}
-              onToggleFavorite={handleToggleFavorite}
+              onToggleFavorite={userId ? handleToggleFavorite : undefined}
             />
           ))}
         </div>

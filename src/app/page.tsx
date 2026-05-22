@@ -1,19 +1,8 @@
-// app/page.tsx
-import Image from "next/image";
-import { fetchRandomMeals } from "../lib/supabase/fetch-meals";
-import { MealData } from "../lib/supabase/types";
+import { HeroImage, FeatureCards } from "@/components/home/HomePageMeals";
 
-export default async function HomePage() {
-  // Fetch a random meal on the server
-  let mealData: MealData[] = [];
-  try {
-    mealData = await fetchRandomMeals(4);
-  } catch {
-    // page renders fine with empty array
-  }
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-linear-to-br  flex flex-col items-center justify-start p-6">
+    <main className="min-h-screen bg-linear-to-br flex flex-col items-center justify-start p-6">
       {/* Header */}
       <header className="w-full max-w-6xl flex flex-col sm:flex-row items-center justify-between py-8">
         <h1 className="text-4xl sm:text-5xl font-bold text-primary">
@@ -39,28 +28,14 @@ export default async function HomePage() {
               View all meals
             </a>
             <a
-              href="/"
+              href="/recipes?sort=trending"
               className="px-6 py-3 border border-primary text-primary font-semibold rounded-lg hover:bg-orange-50 transition"
             >
               View trending meals
             </a>
           </div>
         </div>
-        <div className="flex-1 relative w-full aspect-4/3 max-h-125 group overflow-hidden rounded-lg shadow-lg">
-          {mealData ? (
-            <Image
-              src={mealData[0].image_url}
-              alt={mealData[0].name}
-              fill
-              sizes="(max-width: 640px) 100vw, 50vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-              Loading...
-            </div>
-          )}
-        </div>
+        <HeroImage />
       </section>
 
       {/* About Section */}
@@ -75,78 +50,7 @@ export default async function HomePage() {
         </p>
       </section>
 
-      {/* Features / Highlights */}
-      <section
-        id="meals"
-        className="w-full max-w-6xl py-16 grid grid-cols-1 sm:grid-cols-3 gap-8"
-      >
-        <div className="group bg-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
-          {mealData[0] ? (
-            <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
-              <Image
-                src={mealData[1].image_url}
-                alt={mealData[1].name}
-                fill
-                sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
-            </div>
-          ) : (
-            <div className="w-full aspect-square bg-gray-200 animate-pulse rounded-xl mb-6" />
-          )}
-
-          <h4 className="text-2xl font-semibold text-orange-700">Discover</h4>
-
-          <p className="mt-3 text-white">
-            Search meals by name, category, or first letter.
-          </p>
-        </div>
-        <div className="group bg-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
-          {mealData[0] ? (
-            <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
-              <Image
-                src={mealData[2].image_url}
-                alt={mealData[2].name}
-                fill
-                sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
-            </div>
-          ) : (
-            <div className="w-full aspect-square bg-gray-200 animate-pulse rounded-xl mb-6" />
-          )}
-
-          <h4 className="text-2xl font-semibold text-orange-700">Favorites</h4>
-
-          <p className="mt-3 text-white">
-            Save your favorite meals and quickly access them anytime.
-          </p>
-        </div>
-        <div className="group bg-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-8 flex flex-col items-center text-center">
-          {mealData[0] ? (
-            <div className="relative w-full aspect-square overflow-hidden rounded-xl mb-6">
-              <Image
-                src={mealData[3].image_url}
-                alt={mealData[3].name}
-                fill
-                sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
-            </div>
-          ) : (
-            <div className="w-full aspect-square bg-gray-200 animate-pulse rounded-xl mb-6" />
-          )}
-
-          <h4 className="text-2xl font-semibold text-orange-700">Discover</h4>
-
-          <p className="mt-3 text-white">
-            Search meals by name, category, or first letter.
-          </p>
-        </div>
-      </section>
+      <FeatureCards />
 
       {/* Footer */}
       <footer className="w-full max-w-6xl py-8 text-center text-gray-500 text-sm border-t border-gray-200">
