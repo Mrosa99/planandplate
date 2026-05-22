@@ -32,10 +32,7 @@ export async function fetchMealsPagination(
     .order(column, { ascending: false })
     .range(offset, offset + limit - 1);
 
-  if (error) {
-    console.error("Supabase fetchMeals error:", error);
-    return [];
-  }
+  if (error) throw new Error(error.message ?? "Failed to fetch meals");
 
   return data || [];
 }
@@ -44,10 +41,7 @@ export async function fetchTrendingMeals(limit: number, offset: number): Promise
   const { data, error } = await supabase
     .rpc("get_trending_meals", { p_limit: limit, p_offset: offset });
 
-  if (error) {
-    console.error("Supabase fetchTrending error:", error);
-    return [];
-  }
+  if (error) throw new Error(error.message ?? "Failed to fetch trending meals");
 
   return (data ?? []) as MealData[];
 }
@@ -59,10 +53,7 @@ export async function fetchMealData(id: string): Promise<MealDetailData | null> 
     .eq("id_meal", id)
     .single();
 
-  if (error) {
-    console.error("Supabase fetchMealDetails error:", error);
-    return null;
-  }
+  if (error) throw new Error(error.message ?? "Failed to fetch meal details");
 
   return data as MealDetailData | null;
 }

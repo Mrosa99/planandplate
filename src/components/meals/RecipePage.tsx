@@ -24,8 +24,8 @@ export default function RecipePage({ meal }: Props) {
     }
   }
 
-  const category = meal.categories?.category;
-  const area = meal.areas?.area;
+  const category = meal.category ?? meal.categories?.category;
+  const area = meal.area ?? meal.areas?.area;
 
   return (
     <div className="w-full max-w-4xl mx-auto pb-20 flex flex-col gap-8">
@@ -34,34 +34,40 @@ export default function RecipePage({ meal }: Props) {
       <div className="flex flex-col md:flex-row gap-8 items-start">
         <div className="relative w-full md:w-96 aspect-square shrink-0 rounded-2xl overflow-hidden bg-muted flex items-center justify-center">
           {meal.image_url ? (
-            <Image
-              src={meal.image_url}
-              alt={meal.name}
-              fill
-              className="object-cover"
-              priority
-            />
+            meal.image_url.startsWith("http") ? (
+              <Image
+                src={meal.image_url}
+                alt={meal.name}
+                fill
+                className="object-cover"
+                priority
+              />
+            ) : (
+              <span className="text-8xl select-none">{meal.image_url}</span>
+            )
           ) : (
             <span className="text-muted-foreground/30 text-6xl select-none">🍽️</span>
           )}
         </div>
 
         <div className="flex flex-col gap-3 pt-2">
-          <div className="flex flex-wrap gap-2">
-            {category && (
-              <span className="text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-                {category}
-              </span>
-            )}
-            {area && (
-              <span className="text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full border bg-muted text-muted-foreground">
-                {area}
-              </span>
-            )}
-          </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight">{meal.name}</h1>
           {meal.ingredients && meal.ingredients.length > 0 && (
             <p className="text-muted-foreground text-sm">{meal.ingredients.length} ingredients</p>
+          )}
+          {(category || area) && (
+            <div className="flex flex-wrap gap-1.5">
+              {category && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
+                  {category}
+                </span>
+              )}
+              {area && (
+                <span className="text-xs px-2 py-0.5 rounded-full border bg-muted text-muted-foreground font-medium">
+                  {area}
+                </span>
+              )}
+            </div>
           )}
           <RecipeActions mealId={meal.id_meal} />
         </div>

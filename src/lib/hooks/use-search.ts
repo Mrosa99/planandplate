@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useInfiniteScroll } from "./use-infinite-scroll";
-import { searchMeals } from "@/lib/supabase/search";
+import { searchMealsCached } from "@/app/actions/search";
 import { MealData } from "@/lib/supabase/types";
 
 export function useSearch(query: string, debounceMs = 300) {
@@ -13,7 +13,7 @@ export function useSearch(query: string, debounceMs = 300) {
 
   const fetchFn = useCallback(
     (limit: number, offset: number): Promise<MealData[]> =>
-      searchMeals(debouncedQuery, limit, offset),
+      searchMealsCached(debouncedQuery, limit, offset),
     [debouncedQuery],
   );
 

@@ -1,4 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { SendPasswordReset } from "@/lib/supabase/user-auth";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,46 +19,79 @@ export function ForgotPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+
+    const email = (
+      e.currentTarget.elements.namedItem("email") as HTMLInputElement
+    ).value;
+
+    try {
+      await SendPasswordReset(email);
+      setSent(true);
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "An unexpected error occurred",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Enter the email for your account</CardTitle>
+          <CardTitle>Reset your password</CardTitle>
           <CardDescription>
-            Enter your email below to reset your password
+            {sent
+              ? "Check your email for a reset link."
+              : "Enter your email below to reset your password"}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
-                  Send Reset Link
-                </Button>
-              </div>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <a href="/auth/signup" className="underline underline-offset-4">
-                Sign up
+          {sent ? (
+            <div className="mt-2">
+              <a href="/auth/login" className="w-full">
+                <Button variant="outline" className="w-full">Back to Login</Button>
               </a>
             </div>
-            <div className="mt-2 text-center text-sm">
-              Back to{" "}
-              <a href="/auth/login" className="underline underline-offset-4">
-                Login
-              </a>
-            </div>
-          </form>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div className="flex flex-col gap-6">
+                <div className="grid gap-3">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-3">
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Sending..." : "Send Reset Link"}
+                  </Button>
+                </div>
+              </div>
+              <div className="mt-4 text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <a href="/auth/signup" className="underline underline-offset-4">
+                  Sign up
+                </a>
+              </div>
+              <div className="mt-2">
+                <a href="/auth/login" className="w-full">
+                  <Button variant="outline" className="w-full">Back to Login</Button>
+                </a>
+              </div>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>

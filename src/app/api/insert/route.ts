@@ -51,15 +51,16 @@ async function fetchRawMeals(letter: string): Promise<RawMeal[]> {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 
   try {
-    const key = req.headers.get("x-api-key");
-    if (key !== process.env.MEAL_IMPORT_SECRET) {
+    const authHeader = req.headers.get("authorization");
+    const cronSecret = process.env.CRON_SECRET;
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 },
@@ -131,13 +132,10 @@ export async function POST(req: NextRequest) {
       return mealId ? extractIngredients(raw, mealId) : [];
     });
 
-    // 7. Replace ingredients (delete + insert to handle updates cleanly)
-    const mealIds = [...mealIdMap.values()];
-    await supabase.from("ingredients").delete().in("meal_id", mealIds);
-
+    // 7. Upsert ingredients (unique constraint on meal_id + name required in DB)
     const { error: ingError } = await supabase
       .from("ingredients")
-      .insert(allIngredients);
+      .upsert(allIngredients, { onConflict: "meal_id,name" });
 
     if (ingError) {
       return NextResponse.json(
@@ -152,7 +150,6 @@ export async function POST(req: NextRequest) {
       ingredients: allIngredients.length,
     });
   } catch (err: unknown) {
-    console.error("Unexpected error inserting meals:", err);
     return NextResponse.json(
       {
         success: false,
