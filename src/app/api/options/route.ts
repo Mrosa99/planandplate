@@ -12,8 +12,9 @@ export async function GET(req: NextRequest) {
     supabase.from("areas").select("id_area, area, code").order("area"),
   ]);
 
-  if (catErr) console.error("[options] categories error:", catErr.message);
-  if (areaErr) console.error("[options] areas error:", areaErr.message);
+  if (catErr || areaErr) {
+    return NextResponse.json({ error: "Failed to fetch options" }, { status: 500 });
+  }
 
   return NextResponse.json({
     categories: categories ?? [],
