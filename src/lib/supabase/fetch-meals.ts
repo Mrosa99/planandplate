@@ -46,6 +46,23 @@ export async function fetchTrendingMeals(limit: number, offset: number): Promise
   return (data ?? []) as MealData[];
 }
 
+export async function fetchMealsByCategory(
+  categoryId: string,
+  limit = 20,
+  offset = 0,
+): Promise<MealData[]> {
+  const { data, error } = await supabase
+    .from("meals")
+    .select("*")
+    .eq("id_category", categoryId)
+    .eq("is_public", true)
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) throw new Error(error.message ?? "Failed to fetch meals by category");
+  return data || [];
+}
+
 export async function fetchMealData(id: string): Promise<MealDetailData | null> {
   const { data, error } = await supabase
     .from("meals")

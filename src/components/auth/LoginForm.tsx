@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Login } from "@/lib/supabase/user-auth";
 import { toast } from "sonner";
@@ -23,6 +23,8 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const confirmed = searchParams.get("confirmed") === "true";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -46,6 +48,11 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
+      {confirmed && (
+        <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-700 text-center">
+          Email confirmed! You can now log in.
+        </div>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
