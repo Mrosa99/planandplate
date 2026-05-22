@@ -44,7 +44,7 @@ function getInitials(email: string) {
 }
 
 export function SettingsPage() {
-  const { session } = useAuth();
+  const { session, refreshProfile } = useAuth();
   const email = session?.user.email ?? "";
 
   const [username, setUsername] = useState("");
@@ -103,6 +103,7 @@ export function SettingsPage() {
     try {
       await ChangeAvatar(session!.user.id, id);
       setAvatar(id);
+      refreshProfile();
       toast.success("Avatar updated");
     } catch {
       toast.error("Failed to update avatar");
@@ -367,7 +368,7 @@ export function SettingsPage() {
               <button
                 key={a.id}
                 onClick={() => handleAvatarSelect(a.id)}
-                className={`rounded-full w-16 h-16 flex items-center justify-center text-3xl mx-auto transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${a.bg} ${
+                className={`rounded-full w-16 h-16 flex items-center justify-center text-3xl mx-auto transition-transform hover:scale-110 focus:outline-none ${a.bg} ${
                   avatar === a.id ? "ring-2 ring-ring ring-offset-2" : ""
                 }`}
               >

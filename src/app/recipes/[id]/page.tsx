@@ -15,8 +15,7 @@ export default async function MealDetailPage({ params }: Props) {
 
   try {
     meal = await fetchMealData(id);
-  } catch (err) {
-    console.error("Error fetching meal:", err);
+  } catch {
     return notFound();
   }
 

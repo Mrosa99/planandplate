@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Heart, BookMarked } from "lucide-react";
+import { toast } from "sonner";
+import { Heart, BookMarked, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +20,7 @@ import {
 import {
   fetchCollections,
   addMealToCollection,
+  createCollection,
 } from "@/lib/supabase/collections";
 import { CollectionItem } from "@/lib/supabase/types";
 
@@ -30,6 +33,8 @@ export function RecipeActions({ mealId }: { mealId: string }) {
   const [collectionsOpen, setCollectionsOpen] = useState(false);
   const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [addingToId, setAddingToId] = useState<string | null>(null);
+  const [newCollectionName, setNewCollectionName] = useState("");
+  const [creatingCollection, setCreatingCollection] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -69,8 +74,31 @@ export function RecipeActions({ mealId }: { mealId: string }) {
     try {
       await addMealToCollection(collectionId, mealId);
       setCollectionsOpen(false);
+    } catch (err) {
+      if (err instanceof Error && err.message === "already_in_collection") {
+        toast.info("This meal is already in that collection");
+      } else {
+        toast.error("Failed to add to collection");
+      }
     } finally {
       setAddingToId(null);
+    }
+  }
+
+  async function handleCreateAndAdd() {
+    if (!userId || !newCollectionName.trim()) return;
+    setCreatingCollection(true);
+    try {
+      const id = await createCollection(userId, newCollectionName.trim());
+      await addMealToCollection(id, mealId);
+      setCollections((prev) => [{ id, name: newCollectionName.trim(), recipeCount: 1 }, ...prev]);
+      setNewCollectionName("");
+      setCollectionsOpen(false);
+      toast.success(`Added to "${newCollectionName.trim()}"`);
+    } catch {
+      toast.error("Failed to create collection");
+    } finally {
+      setCreatingCollection(false);
     }
   }
 
@@ -103,16 +131,12 @@ export function RecipeActions({ mealId }: { mealId: string }) {
         </Button>
       </div>
 
-      <Dialog open={collectionsOpen} onOpenChange={setCollectionsOpen}>
+      <Dialog open={collectionsOpen} onOpenChange={(o) => { setCollectionsOpen(o); if (!o) setNewCollectionName(""); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Add to collection</DialogTitle>
           </DialogHeader>
-          {collections.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">
-              No collections yet. Create one on the collections page.
-            </p>
-          ) : (
+          {collections.length > 0 && (
             <ul className="flex flex-col gap-1 mt-1">
               {collections.map((col) => (
                 <li key={col.id}>
@@ -132,6 +156,22 @@ export function RecipeActions({ mealId }: { mealId: string }) {
               ))}
             </ul>
           )}
+          <div className="border-t pt-3 mt-1 flex gap-2">
+            <Input
+              placeholder="New collection name"
+              value={newCollectionName}
+              onChange={(e) => setNewCollectionName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleCreateAndAdd()}
+            />
+            <Button
+              size="sm"
+              onClick={handleCreateAndAdd}
+              disabled={!newCollectionName.trim() || creatingCollection}
+              className="shrink-0"
+            >
+              <Plus className="size-4" />
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>

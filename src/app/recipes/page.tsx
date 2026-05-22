@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import MealCard from "@/components/meals/MealCard";
 import { fetchMealsPagination, fetchTrendingMeals } from "@/lib/supabase/fetch-meals";
 import { fetchFavoriteMealIds, addFavorite, removeFavorite } from "@/lib/supabase/favorites";
@@ -60,6 +61,7 @@ function RecipesContent() {
     try {
       isFav ? await removeFavorite(userId, mealId) : await addFavorite(userId, mealId);
     } catch {
+      toast.error(isFav ? "Failed to remove from favorites" : "Failed to save to favorites");
       setFavoritedIds((prev) => {
         const next = new Set(prev);
         isFav ? next.add(mealId) : next.delete(mealId);

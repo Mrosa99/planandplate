@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import { MealTileCard } from "@/components/meals/MealTileCard";
 import {
   fetchFavoritePagination,
@@ -31,6 +32,7 @@ const FavoritesList = ({ userId }: { userId: string }) => {
       await removeFavorite(userId, mealId);
       setTimeout(() => removeItem((m) => m.id_meal === mealId), 300);
     } catch {
+      toast.error("Failed to remove from favorites");
       setRemovingIds((prev) => {
         const next = new Set(prev);
         next.delete(mealId);

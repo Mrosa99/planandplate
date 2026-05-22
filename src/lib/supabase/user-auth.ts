@@ -38,6 +38,16 @@ export async function Logout() {
   await supabase.auth.signOut();
 }
 
+export async function SendPasswordReset(email: string) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+  });
+
+  if (error) {
+    throw new Error("Could not send reset email. Please try again.");
+  }
+}
+
 export async function ChangePassword(
   email: string,
   currentPassword: string,

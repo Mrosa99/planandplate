@@ -8,8 +8,8 @@ export default async function HomePage() {
   let mealData: MealData[] = [];
   try {
     mealData = await fetchRandomMeals(4);
-  } catch (err) {
-    console.error("Error fetching random meal:", err);
+  } catch {
+    // page renders fine with empty array
   }
 
   return (

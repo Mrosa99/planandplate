@@ -69,7 +69,10 @@ export async function addMealToCollection(
     .from("collection_meals")
     .insert({ collection_id: collectionId, meal_id: mealId });
 
-  if (error) throw new Error(error.message ?? "Failed to add meal to collection");
+  if (error) {
+    if (error.code === "23505") throw new Error("already_in_collection");
+    throw new Error(error.message ?? "Failed to add meal to collection");
+  }
 }
 
 export async function deleteCollection(collectionId: string): Promise<void> {

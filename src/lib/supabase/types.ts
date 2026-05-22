@@ -13,6 +13,8 @@ export interface Ingredient {
 export interface MealDetailData extends MealData {
   instructions?: string;
   id_category?: string;
+  category?: string;
+  area?: string;
   categories?: { category: string } | null;
   areas?: { area: string } | null;
   ingredients?: Ingredient[];

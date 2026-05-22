@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, X, Globe, Lock } from "lucide-react";
+import { Plus, Trash2, Globe, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
@@ -44,8 +44,10 @@ const emptyStep = (): StepRow => ({
 });
 
 export function CreateMealDialog({ accessToken, open, onOpenChange, onCreated }: Props) {
+  const FOOD_EMOJIS = ["🍕","🍔","🌮","🌯","🥙","🌭","🍜","🍝","🍱","🍣","🥩","🍗","🥘","🍲","🫕","🍳","🥞","🥓","🥗","🧆","🦐","🥑","🧄","🧅","🥦","🌽","🍅","🍰","🎂","🧁","🍩","🍪","☕","🧋","🍵"];
+
   const [name, setName] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [emoji, setEmoji] = useState("");
   const [category, setCategory] = useState("");
   const [area, setArea] = useState("");
   const [steps, setSteps] = useState<StepRow[]>([emptyStep()]);
@@ -70,7 +72,7 @@ export function CreateMealDialog({ accessToken, open, onOpenChange, onCreated }:
   }, []);
 
   function reset() {
-    setName(""); setImageUrl(""); setCategory(""); setArea("");
+    setName(""); setEmoji(""); setCategory(""); setArea("");
     setSteps([emptyStep()]); setIngredients([emptyIngredient()]); setIsPublic(false); setError(null);
   }
 
@@ -117,7 +119,7 @@ export function CreateMealDialog({ accessToken, open, onOpenChange, onCreated }:
         },
         body: JSON.stringify({
           name: name.trim(),
-          image_url: imageUrl.trim() || undefined,
+          image_url: emoji || undefined,
           category: category || undefined,
           area: area || undefined,
           instructions: steps.filter((s) => s.text.trim()).map((s) => s.text.trim()).join("\n\n") || undefined,
@@ -132,7 +134,7 @@ export function CreateMealDialog({ accessToken, open, onOpenChange, onCreated }:
       onCreated({
         id_meal: json.id_meal,
         name: name.trim(),
-        image_url: imageUrl.trim() || undefined,
+        image_url: emoji || undefined,
         category: category || undefined,
         area: area || undefined,
         is_public: isPublic,
@@ -164,24 +166,21 @@ export function CreateMealDialog({ accessToken, open, onOpenChange, onCreated }:
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-muted-foreground">Image URL <span className="text-xs">(optional)</span></label>
-            <Input
-              placeholder="https://..."
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
-            {imageUrl && (
-              <div className="relative w-full h-40 rounded-lg overflow-hidden border mt-1">
-                <img src={imageUrl} alt="preview" className="w-full h-full object-cover" />
+            <label className="text-sm font-medium text-muted-foreground">Meal icon <span className="text-xs">(optional)</span></label>
+            <div className="flex flex-wrap gap-2">
+              {FOOD_EMOJIS.map((e) => (
                 <button
+                  key={e}
                   type="button"
-                  onClick={() => setImageUrl("")}
-                  className="absolute top-2 right-2 p-1 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+                  onClick={() => setEmoji(emoji === e ? "" : e)}
+                  className={`w-10 h-10 flex items-center justify-center rounded-lg text-xl transition-colors hover:bg-muted focus:outline-none ${
+                    emoji === e ? "ring-2 ring-ring ring-offset-2 bg-muted" : ""
+                  }`}
                 >
-                  <X className="size-3.5 text-white" />
+                  {e}
                 </button>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

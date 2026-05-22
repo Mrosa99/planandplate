@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Login } from "@/lib/supabase/user-auth";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 
 export function LoginForm({
@@ -20,12 +22,10 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
     setLoading(true);
 
     const form = e.currentTarget;
@@ -35,11 +35,10 @@ export function LoginForm({
 
     try {
       await Login(email, password);
+      toast.success("Welcome back!");
       router.push("/");
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "An unexpected error occurred",
-      );
+      toast.error(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -77,7 +76,7 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" name="password" type="password" required />
+                <PasswordInput id="password" name="password" required />
               </div>
 
               <div className="flex flex-col gap-3">
@@ -86,8 +85,6 @@ export function LoginForm({
                 </Button>
               </div>
             </div>
-
-            {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
 
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
