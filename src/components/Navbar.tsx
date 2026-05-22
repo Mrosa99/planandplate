@@ -4,6 +4,7 @@ import {
   Book,
   BookMarked,
   CalendarDays,
+  ChefHat,
   Heart,
   LogOut,
   Menu,
@@ -190,7 +191,7 @@ const Navbar1 = ({
           <div className="flex items-center gap-6">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <img src={logo.src} className="max-h-8" alt={logo.alt} />
+              <ChefHat className="size-7 text-primary" />
               <span className="text-lg font-semibold tracking-tighter">
                 {logo.title}
               </span>
@@ -272,7 +273,7 @@ const Navbar1 = ({
           <div className="flex items-center justify-between pl-5 pr-5">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <img src={logo.src} className="max-h-8" alt={logo.alt} />
+              <ChefHat className="size-7 text-primary" />
             </div>
             <Sheet>
               <SheetTrigger asChild>
@@ -284,7 +285,7 @@ const Navbar1 = ({
                 <SheetHeader>
                   <SheetTitle>
                     <div className="flex items-center gap-2">
-                      <img src={logo.src} className="max-h-8" alt={logo.alt} />
+                      <ChefHat className="size-7 text-primary" />
                     </div>
                   </SheetTitle>
                 </SheetHeader>

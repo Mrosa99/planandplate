@@ -21,9 +21,17 @@ type MealEntry = {
   type: MealType;
   name: string;
   notes: string;
+  image_url?: string;
 };
 
 const MEAL_TYPES: MealType[] = ["Breakfast", "Lunch", "Dinner", "Snack"];
+
+const MEAL_ORDER: Record<MealType, number> = {
+  Breakfast: 0,
+  Lunch: 1,
+  Dinner: 2,
+  Snack: 3,
+};
 
 const MEAL_COLORS: Record<MealType, string> = {
   Breakfast: "bg-blue-500/20 text-blue-300 border-blue-500/30",
@@ -51,9 +59,10 @@ export function MealCalendar() {
   const [entries, setEntries] = useState<MealEntry[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalOpen, setModalOpen]       = useState(false);
-  const [formType, setFormType]   = useState<MealType>("Breakfast");
-  const [formName, setFormName]   = useState("");
-  const [formNotes, setFormNotes] = useState("");
+  const [formType, setFormType]     = useState<MealType>("Breakfast");
+  const [formName, setFormName]     = useState("");
+  const [formNotes, setFormNotes]   = useState("");
+  const [formImageUrl, setFormImageUrl] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
 
   const { items: searchResults, loading: searchLoading, observerRef: searchObserverRef } = useSearch(formName);
@@ -83,6 +92,7 @@ export function MealCalendar() {
     setFormType("Breakfast");
     setFormName("");
     setFormNotes("");
+    setFormImageUrl("");
     setModalOpen(true);
   }
 
@@ -94,10 +104,12 @@ export function MealCalendar() {
       type: formType,
       name: formName.trim(),
       notes: formNotes.trim(),
+      image_url: formImageUrl || undefined,
     };
     saveEntries([...entries, entry]);
     setFormName("");
     setFormNotes("");
+    setFormImageUrl("");
   }
 
   function deleteEntry(id: string) {
@@ -115,7 +127,7 @@ export function MealCalendar() {
   while (cells.length % 7 !== 0) cells.push(null);
 
   const selectedEntries = selectedDate
-    ? entries.filter(e => e.date === selectedDate)
+    ? entries.filter(e => e.date === selectedDate).sort((a, b) => MEAL_ORDER[a.type] - MEAL_ORDER[b.type])
     : [];
 
   const formattedSelectedDate = selectedDate
@@ -175,7 +187,7 @@ export function MealCalendar() {
           if (!day) return <div key={i} className="min-h-[90px] rounded-lg" />;
 
           const dateKey    = toDateKey(year, month, day);
-          const dayEntries = entries.filter(e => e.date === dateKey);
+          const dayEntries = entries.filter(e => e.date === dateKey).sort((a, b) => MEAL_ORDER[a.type] - MEAL_ORDER[b.type]);
           const isToday    = dateKey === todayKey;
           const isPast     = dateKey < todayKey;
           const isDisabled = isPast && dayEntries.length === 0;
@@ -233,7 +245,14 @@ export function MealCalendar() {
                   key={entry.id}
                   className={`flex items-start justify-between gap-2 p-2.5 rounded-lg border ${MEAL_COLORS[entry.type]}`}
                 >
-                  <div className="min-w-0">
+                  {entry.image_url && (
+                    <img
+                      src={entry.image_url}
+                      alt={entry.name}
+                      className="size-10 rounded-md object-cover shrink-0"
+                    />
+                  )}
+                  <div className="min-w-0 flex-1">
                     <p className="text-[11px] font-medium opacity-70 uppercase tracking-wide">
                       {entry.type}
                     </p>
@@ -285,7 +304,7 @@ export function MealCalendar() {
                   className="pl-9"
                   placeholder="Search or type a meal name..."
                   value={formName}
-                  onChange={e => setFormName(e.target.value)}
+                  onChange={e => { setFormName(e.target.value); setFormImageUrl(""); }}
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
                   onKeyDown={e => e.key === "Enter" && addEntry()}
@@ -304,7 +323,7 @@ export function MealCalendar() {
                     <button
                       key={meal.id_meal}
                       type="button"
-                      onMouseDown={() => setFormName(meal.name)}
+                      onMouseDown={() => { setFormName(meal.name); setFormImageUrl(meal.image_url ?? ""); }}
                       className="flex items-center gap-3 px-3 py-2 hover:bg-muted transition-colors text-left w-full"
                     >
                       {meal.image_url && (
