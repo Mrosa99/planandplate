@@ -15,14 +15,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [submitted, setSubmitted] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
   async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -42,13 +42,35 @@ export function SignupForm({
 
     try {
       await Signup(email, password, username);
-      toast.success("Account created! Welcome to Plan & Plate");
-      router.replace("/");
+      setSubmittedEmail(email);
+      setSubmitted(true);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Signup failed");
     } finally {
       setLoading(false);
     }
+  }
+
+  if (submitted) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card>
+          <CardHeader>
+            <CardTitle>Check your email</CardTitle>
+            <CardDescription>
+              We sent a confirmation link to <strong>{submittedEmail}</strong>. Click it to activate your account.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mt-2">
+              <a href="/auth/login" className="w-full">
+                <Button variant="outline" className="w-full">Back to Login</Button>
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
