@@ -3,7 +3,7 @@ import { supabase } from "./supabase-client";
 export async function fetchProfile(userId: string) {
   const { data, error } = await supabase
     .from("profiles")
-    .select("username, full_name, avatar")
+    .select("username, avatar")
     .eq("id", userId)
     .single();
 
@@ -20,14 +20,6 @@ export async function ChangeAvatar(userId: string, avatarId: string) {
   if (error) throw new Error("Failed to update avatar. Please try again.");
 }
 
-export async function ChangeFullName(userId: string, fullName: string) {
-  const { error } = await supabase
-    .from("profiles")
-    .update({ full_name: fullName })
-    .eq("id", userId);
-
-  if (error) throw new Error("Failed to update name. Please try again.");
-}
 
 export async function ChangeUsername(userId: string, username: string) {
   const { error } = await supabase

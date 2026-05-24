@@ -49,7 +49,7 @@ export function ForgotPasswordForm({
           <CardTitle>Reset your password</CardTitle>
           <CardDescription>
             {sent
-              ? "Check your email for a reset link."
+              ? "Check your email for a reset link. If you don't see it, check your spam folder."
               : "Enter your email below to reset your password"}
           </CardDescription>
         </CardHeader>

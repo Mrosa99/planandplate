@@ -6,7 +6,6 @@ import { ChangePassword, ChangeEmail } from "@/lib/supabase/user-auth";
 import {
   fetchProfile,
   ChangeUsername,
-  ChangeFullName,
   ChangeAvatar,
 } from "@/lib/supabase/profile";
 import { toast } from "sonner";
@@ -48,7 +47,6 @@ export function SettingsPage() {
   const email = session?.user.email ?? "";
 
   const [username, setUsername] = useState("");
-  const [fullName, setFullName] = useState("");
   const [avatar, setAvatar] = useState("");
 
   // Avatar picker
@@ -60,12 +58,6 @@ export function SettingsPage() {
   const [usernameLoading, setUsernameLoading] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [usernameConfirmOpen, setUsernameConfirmOpen] = useState(false);
-
-  // Name dialog
-  const [fullNameOpen, setFullNameOpen] = useState(false);
-  const [newFullName, setNewFullName] = useState("");
-  const [fullNameLoading, setFullNameLoading] = useState(false);
-  const [fullNameError, setFullNameError] = useState<string | null>(null);
 
   // Email dialog
   const [emailOpen, setEmailOpen] = useState(false);
@@ -91,7 +83,6 @@ export function SettingsPage() {
     fetchProfile(session.user.id)
       .then((data) => {
         setUsername(data.username ?? "");
-        setFullName(data.full_name ?? "");
         setAvatar(data.avatar ?? "");
       })
       .catch(() => toast.error("Failed to load profile"));
@@ -109,29 +100,6 @@ export function SettingsPage() {
       toast.error("Failed to update avatar");
     } finally {
       setAvatarPickerOpen(false);
-    }
-  }
-
-  // --- Name handlers ---
-  async function handleFullNameUpdate() {
-    setFullNameError(null);
-    if (!newFullName.trim()) {
-      setFullNameError("Please enter a name.");
-      return;
-    }
-    setFullNameLoading(true);
-    try {
-      await ChangeFullName(session!.user.id, newFullName.trim());
-      setFullName(newFullName.trim());
-      toast.success("Name updated");
-      setFullNameOpen(false);
-    } catch (err: unknown) {
-      setFullNameError(
-        err instanceof Error ? err.message : "Something went wrong.",
-      );
-    } finally {
-      setNewFullName("");
-      setFullNameLoading(false);
     }
   }
 
@@ -295,26 +263,6 @@ export function SettingsPage() {
             <div className="border-t" />
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">Name</p>
-                <p className="text-sm text-muted-foreground">
-                  {fullName || "Not set"}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setFullNameError(null);
-                  setNewFullName("");
-                  setFullNameOpen(true);
-                }}
-              >
-                Change
-              </Button>
-            </div>
-            <div className="border-t" />
-            <div className="flex items-center justify-between">
-              <div>
                 <p className="text-sm font-medium">Email</p>
                 <p className="text-sm text-muted-foreground">{email}</p>
               </div>
@@ -375,46 +323,6 @@ export function SettingsPage() {
                 {a.emoji}
               </button>
             ))}
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Change Name dialog */}
-      <Dialog
-        open={fullNameOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            setNewFullName("");
-            setFullNameError(null);
-          }
-          setFullNameOpen(open);
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Change Name</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4">
-            {fullNameError && (
-              <p className="text-sm text-red-500">{fullNameError}</p>
-            )}
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="new-full-name">New Name</Label>
-              <Input
-                id="new-full-name"
-                placeholder="John Doe"
-                value={newFullName}
-                onChange={(e) => setNewFullName(e.target.value)}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setFullNameOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleFullNameUpdate} disabled={fullNameLoading}>
-                {fullNameLoading ? "Saving..." : "Update Name"}
-              </Button>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -502,7 +410,7 @@ export function SettingsPage() {
           <div className="flex flex-col gap-4">
             {emailSuccess && (
               <p className="text-sm text-green-500">
-                Email updated. Check your new inbox for a confirmation link.
+                Email updated. Check your new inbox for a confirmation link. If you don&apos;t see it, check your spam folder.
               </p>
             )}
             {emailError && <p className="text-sm text-red-500">{emailError}</p>}
