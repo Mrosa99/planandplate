@@ -58,7 +58,7 @@ export function SignupForm({
           <CardHeader>
             <CardTitle>Check your email</CardTitle>
             <CardDescription>
-              We sent a confirmation link to <strong>{submittedEmail}</strong>. Click it to activate your account.
+              We sent a confirmation link to <strong>{submittedEmail}</strong>. Click it to activate your account. If you don&apos;t see it, check your spam folder.
             </CardDescription>
           </CardHeader>
           <CardContent>
