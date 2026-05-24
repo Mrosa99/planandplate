@@ -14,10 +14,16 @@ export async function Login(email: string, password: string) {
 }
 
 export async function Signup(email: string, password: string, username: string) {
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${window.location.origin}/auth/callback?type=signup`,
+    },
+  });
 
   if (error) {
-    throw new Error("Could not create account. Please try again.");
+    throw new Error(error.message);
   }
 
   if (data.user) {
