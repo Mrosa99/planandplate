@@ -19,22 +19,15 @@ export async function Signup(email: string, password: string, username: string) 
     password,
     options: {
       emailRedirectTo: `${window.location.origin}/auth/callback`,
+      data: { username },
     },
   });
 
   if (error) {
-    throw new Error(error.message);
-  }
-
-  if (data.user) {
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({ username })
-      .eq("id", data.user.id);
-
-    if (profileError?.code === "23505") {
+    if (error.message.includes("23505") || error.message.toLowerCase().includes("unique")) {
       throw new Error("Username is already taken.");
     }
+    throw new Error(error.message);
   }
 
   return data;
