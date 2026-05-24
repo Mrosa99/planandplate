@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Book,
   BookMarked,
@@ -99,6 +100,8 @@ const Navbar1 = ({
   },
 }: Navbar1Props) => {
   const { session, avatar } = useAuth();
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const closeSheet = () => setSheetOpen(false);
 
   const AVATARS: Record<string, { emoji: string; bg: string }> = {
     chef:  { emoji: "👨‍🍳", bg: "bg-orange-400" },
@@ -120,7 +123,6 @@ const Navbar1 = ({
   }
 
   const defaultMenu: MenuItem[] = [
-    { title: "Home", url: "/" },
     {
       title: "Recipes",
       url: "#",
@@ -190,12 +192,12 @@ const Navbar1 = ({
         <nav className="hidden justify-between lg:flex w-full items-center">
           <div className="flex items-center gap-6">
             {/* Logo */}
-            <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <ChefHat className="size-7 text-primary" />
               <span className="text-lg font-semibold tracking-tighter">
                 {logo.title}
               </span>
-            </div>
+            </Link>
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>
@@ -272,10 +274,10 @@ const Navbar1 = ({
         <div className="block lg:hidden justify-between w-full ">
           <div className="flex items-center justify-between pl-5 pr-5">
             {/* Logo */}
-            <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <ChefHat className="size-7 text-primary" />
-            </div>
-            <Sheet>
+            </Link>
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
                   <Menu className="size-4" />
@@ -295,7 +297,7 @@ const Navbar1 = ({
                     collapsible
                     className="flex w-full flex-col gap-4"
                   >
-                    {visibleMenu.map((item) => renderMobileMenuItem(item))}
+                    {visibleMenu.map((item) => renderMobileMenuItem(item, closeSheet))}
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
@@ -315,13 +317,14 @@ const Navbar1 = ({
                             <Link
                               key={label}
                               href={href}
+                              onClick={closeSheet}
                               className="flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium hover:bg-muted"
                             >
                               {icon} {label}
                             </Link>
                           ))}
                         </div>
-                        <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+                        <Button variant="outline" onClick={() => { closeSheet(); handleLogout(); }} className="flex items-center gap-2">
                           <LogOut className="size-4" /> {auth.logout?.title ?? "Logout"}
                         </Button>
                       </>
@@ -329,10 +332,10 @@ const Navbar1 = ({
                     {!isAuthenticated && (
                       <>
                         <Button asChild variant="outline">
-                          <Link href={auth.login.url}>{auth.login.title}</Link>
+                          <Link href={auth.login.url} onClick={closeSheet}>{auth.login.title}</Link>
                         </Button>
                         <Button asChild>
-                          <Link href={auth.signup.url}>{auth.signup.title}</Link>
+                          <Link href={auth.signup.url} onClick={closeSheet}>{auth.signup.title}</Link>
                         </Button>
                       </>
                     )}
@@ -372,7 +375,7 @@ const renderMenuItem = (item: MenuItem) => {
   );
 };
 
-const renderMobileMenuItem = (item: MenuItem) => {
+const renderMobileMenuItem = (item: MenuItem, onClose?: () => void) => {
   if (item.items) {
     return (
       <AccordionItem key={item.title} value={item.title} className="border-b-0">
@@ -382,7 +385,7 @@ const renderMobileMenuItem = (item: MenuItem) => {
         <AccordionContent className="mt-2">
           <div className="flex flex-col">
             {item.items.map((subItem) => (
-              <SubMenuLink key={subItem.title} item={subItem} />
+              <SubMenuLink key={subItem.title} item={subItem} onClose={onClose} />
             ))}
           </div>
         </AccordionContent>
@@ -391,13 +394,13 @@ const renderMobileMenuItem = (item: MenuItem) => {
   }
 
   return (
-    <Link key={item.title} href={item.url} className="text-md font-semibold">
+    <Link key={item.title} href={item.url} onClick={onClose} className="text-md font-semibold">
       {item.title}
     </Link>
   );
 };
 
-const SubMenuLink = ({ item }: { item: MenuItem }) => {
+const SubMenuLink = ({ item, onClose }: { item: MenuItem; onClose?: () => void }) => {
   const className = "flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground w-full text-left";
   const content = (
     <>
@@ -415,14 +418,14 @@ const SubMenuLink = ({ item }: { item: MenuItem }) => {
 
   if (item.onClick) {
     return (
-      <button className={className} onClick={item.onClick}>
+      <button className={className} onClick={() => { item.onClick?.(); onClose?.(); }}>
         {content}
       </button>
     );
   }
 
   return (
-    <Link className={className} href={item.url}>
+    <Link className={className} href={item.url} onClick={onClose}>
       {content}
     </Link>
   );
