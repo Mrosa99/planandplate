@@ -54,7 +54,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="w-full max-w-6xl py-8 text-center text-gray-500 text-sm border-t border-gray-200">
-        &copy; {new Date().getFullYear()} Plan & Plate. All rights reserved.
+        Created by Milton R.
       </footer>
     </main>
   );
