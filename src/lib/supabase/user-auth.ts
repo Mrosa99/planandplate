@@ -14,6 +14,14 @@ export async function Login(email: string, password: string) {
 }
 
 export async function Signup(email: string, password: string, username: string) {
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (existing) throw new Error("Username is already taken.");
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -24,10 +32,17 @@ export async function Signup(email: string, password: string, username: string) 
   });
 
   if (error) {
-    if (error.message.includes("23505") || error.message.toLowerCase().includes("unique")) {
-      throw new Error("Username is already taken.");
+    const msg = error.message.toLowerCase();
+    if (msg.includes("already registered") || msg.includes("already been registered")) {
+      throw new Error("An account with this email already exists. Try logging in.");
     }
-    throw new Error(error.message);
+    if (msg.includes("password")) {
+      throw new Error("Password must be at least 6 characters.");
+    }
+    if (msg.includes("unable to validate email") || msg.includes("invalid email")) {
+      throw new Error("Please enter a valid email address.");
+    }
+    throw new Error("Something went wrong. Please try again.");
   }
 
   return data;
@@ -35,6 +50,15 @@ export async function Signup(email: string, password: string, username: string) 
 
 export async function Logout() {
   await supabase.auth.signOut();
+}
+
+export async function ResendConfirmation(email: string) {
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+    options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+  });
+  if (error) throw new Error("Failed to resend email. Please try again.");
 }
 
 export async function SendPasswordReset(email: string) {

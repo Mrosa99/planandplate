@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Signup } from "@/lib/supabase/user-auth";
+import { Signup, ResendConfirmation } from "@/lib/supabase/user-auth";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,32 @@ export function SignupForm({
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resending, setResending] = useState(false);
+
+  useEffect(() => {
+    if (!submitted) return;
+    setResendCooldown(90);
+  }, [submitted]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  async function handleResend() {
+    setResending(true);
+    try {
+      await ResendConfirmation(submittedEmail);
+      toast.success("Confirmation email resent.");
+      setResendCooldown(90);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to resend email.");
+    } finally {
+      setResending(false);
+    }
+  }
 
   async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,8 +60,26 @@ export function SignupForm({
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
     const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement).value;
 
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      toast.error("Username can only contain letters, numbers, and underscores.");
+      setLoading(false);
+      return;
+    }
+
+    if (username.length < 3 || username.length > 20) {
+      toast.error("Username must be between 3 and 20 characters.");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      setLoading(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("Passwords do not match.");
       setLoading(false);
       return;
     }
@@ -61,12 +105,22 @@ export function SignupForm({
               We sent a confirmation link to <strong>{submittedEmail}</strong>. Click it to activate your account. If you don&apos;t see it, check your spam folder.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="mt-2">
-              <a href="/auth/login" className="w-full">
-                <Button variant="outline" className="w-full">Back to Login</Button>
-              </a>
-            </div>
+          <CardContent className="flex flex-col gap-3">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleResend}
+              disabled={resendCooldown > 0 || resending}
+            >
+              {resending
+                ? "Resending..."
+                : resendCooldown > 0
+                ? `Resend email (${resendCooldown}s)`
+                : "Resend email"}
+            </Button>
+            <a href="/auth/login" className="w-full">
+              <Button variant="ghost" className="w-full">Back to Login</Button>
+            </a>
           </CardContent>
         </Card>
       </div>
