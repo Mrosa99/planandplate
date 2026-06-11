@@ -14,13 +14,8 @@ export async function Login(email: string, password: string) {
 }
 
 export async function Signup(email: string, password: string, username: string) {
-  const { data: existing } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("username", username)
-    .maybeSingle();
-
-  if (existing) throw new Error("Username is already taken.");
+  const { data: isTaken } = await supabase.rpc("is_username_taken", { username_to_check: username });
+  if (isTaken) throw new Error("Username is already taken.");
 
   const { data, error } = await supabase.auth.signUp({
     email,
