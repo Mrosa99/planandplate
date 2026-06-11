@@ -33,9 +33,6 @@ export async function Signup(email: string, password: string, username: string) 
 
   if (error) {
     const msg = error.message.toLowerCase();
-    if (msg.includes("already registered") || msg.includes("already been registered")) {
-      throw new Error("An account with this email already exists. Try logging in.");
-    }
     if (msg.includes("password")) {
       throw new Error("Password must be at least 6 characters.");
     }
@@ -43,6 +40,10 @@ export async function Signup(email: string, password: string, username: string) 
       throw new Error("Please enter a valid email address.");
     }
     throw new Error("Something went wrong. Please try again.");
+  }
+
+  if (data.user?.identities?.length === 0) {
+    throw new Error("An account with this email already exists. Try logging in.");
   }
 
   return data;
