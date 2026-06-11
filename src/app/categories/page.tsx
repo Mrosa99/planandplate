@@ -40,7 +40,7 @@ function CategoriesContent() {
     [selectedId],
   );
 
-  const { items: meals, loading, observerRef, reset } = useInfiniteScroll(fetchFn);
+  const { items: meals, loading, observerRef, reset } = useInfiniteScroll(fetchFn, 20, (meal) => meal.id_meal);
 
   useEffect(() => {
     reset();

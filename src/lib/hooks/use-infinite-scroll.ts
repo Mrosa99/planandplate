@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 export function useInfiniteScroll<T>(
   fetchFn: (limit: number, offset: number) => Promise<T[]>,
   pageSize = 20,
+  getId?: (item: T) => string,
 ) {
   const [items, setItems] = useState<T[]>([]);
   const [page, setPage] = useState(1);
@@ -28,7 +29,11 @@ export function useInfiniteScroll<T>(
         const newItems = await fetchFnRef.current(pageSize, (page - 1) * pageSize);
         if (!cancelled) {
           if (newItems.length < pageSize) setHasMore(false);
-          setItems((prev) => [...prev, ...newItems]);
+          setItems((prev) => {
+            if (!getId) return [...prev, ...newItems];
+            const seen = new Set(prev.map(getId));
+            return [...prev, ...newItems.filter((item) => !seen.has(getId(item)))];
+          });
         }
       } finally {
         if (!cancelled) {

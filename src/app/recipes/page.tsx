@@ -9,9 +9,10 @@ import { fetchFavoriteMealIds, addFavorite, removeFavorite } from "@/lib/supabas
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import { useAuth } from "@/components/AuthProvider";
 
-type SortKey = "latest" | "most_saved" | "trending";
+type SortKey = "alphabetical" | "latest" | "most_saved" | "trending";
 
 const SORT_LABELS: Record<SortKey, string> = {
+  alphabetical: "All Recipes",
   latest: "New Recipes",
   most_saved: "Most Saved",
   trending: "Trending",
@@ -22,18 +23,21 @@ function RecipesContent() {
   const userId = session?.user.id;
   const searchParams = useSearchParams();
 
-  const rawSort = searchParams.get("sort") ?? "latest";
-  const sort: SortKey = rawSort === "trending" || rawSort === "most_saved" ? rawSort : "latest";
+  const rawSort = searchParams.get("sort") ?? "alphabetical";
+  const sort: SortKey =
+    rawSort === "trending" || rawSort === "most_saved" || rawSort === "latest"
+      ? rawSort
+      : "alphabetical";
 
   const fetchFn = useCallback(
     (limit: number, offset: number) =>
       sort === "trending"
         ? fetchTrendingMeals(limit, offset)
-        : fetchMealsPagination(limit, offset, sort),
+        : fetchMealsPagination(limit, offset, sort as "alphabetical" | "latest" | "most_saved"),
     [sort],
   );
 
-  const { items: meals, loading, hasMore, observerRef, reset } = useInfiniteScroll(fetchFn);
+  const { items: meals, loading, hasMore, observerRef, reset } = useInfiniteScroll(fetchFn, 20, (meal) => meal.id_meal);
 
   useEffect(() => {
     reset();
@@ -70,7 +74,7 @@ function RecipesContent() {
     }
   }
 
-  const title = sort === "latest" ? "All Recipes" : SORT_LABELS[sort];
+  const title = SORT_LABELS[sort];
 
   return (
     <main className="min-h-screen text-white py-12 px-6 sm:px-12">

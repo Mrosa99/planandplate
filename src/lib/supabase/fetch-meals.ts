@@ -22,14 +22,16 @@ export async function fetchRandomMeals(count: number): Promise<MealData[]> {
 export async function fetchMealsPagination(
   limit = 20,
   offset = 0,
-  sort: "latest" | "most_saved" = "latest",
+  sort: "alphabetical" | "latest" | "most_saved" = "alphabetical",
 ): Promise<MealData[]> {
-  const column = sort === "most_saved" ? "save_count" : "created_at";
   const { data, error } = await supabase
     .from("meals")
     .select("*")
     .eq("is_public", true)
-    .order(column, { ascending: false })
+    .order(sort === "most_saved" ? "save_count" : sort === "latest" ? "created_at" : "name", {
+      ascending: sort === "alphabetical",
+    })
+    .order("id_meal", { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) throw new Error(error.message ?? "Failed to fetch meals");
@@ -56,7 +58,8 @@ export async function fetchMealsByCategory(
     .select("*")
     .eq("id_category", categoryId)
     .eq("is_public", true)
-    .order("created_at", { ascending: false })
+    .order("name", { ascending: true })
+    .order("id_meal", { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) throw new Error(error.message ?? "Failed to fetch meals by category");
