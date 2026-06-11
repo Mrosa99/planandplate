@@ -20,52 +20,16 @@ A full-stack meal planning web app where users can browse recipes, save favorite
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | [Next.js 15](https://nextjs.org) (App Router) |
-| Language | TypeScript |
-| Database & Auth | [Supabase](https://supabase.com) (PostgreSQL + Row Level Security) |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com) |
-| UI Components | [Radix UI](https://www.radix-ui.com) / [shadcn/ui](https://ui.shadcn.com) |
-| Icons | [Lucide React](https://lucide.dev) |
-| Transactional Email | [Resend](https://resend.com) (via Supabase) |
-| Notifications | [Sonner](https://sonner.emilkowal.ski) |
-| Deployment | [Vercel](https://vercel.com) |
-
----
-
-## Running Locally
-
-**Prerequisites:** Node.js 18+, a Supabase project
-
-1. Clone the repo
-
-```bash
-git clone https://github.com/Mrosa99/planandplate.git
-cd planandplate
-```
-
-2. Install dependencies
-
-```bash
-npm install
-```
-
-3. Set up environment variables — create a `.env.local` file at the root:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
-NEXT_PUBLIC_SUPABASE_ANON_ROLE_KEY=your-supabase-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
-```
-
-4. Start the dev server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+| Layer           | Technology                                                                |
+| --------------- | ------------------------------------------------------------------------- |
+| Framework       | [Next.js 15](https://nextjs.org) (App Router)                             |
+| Language        | TypeScript                                                                |
+| Database & Auth | [Supabase](https://supabase.com) (PostgreSQL + Row Level Security)        |
+| Styling         | [Tailwind CSS v4](https://tailwindcss.com)                                |
+| UI Components   | [Radix UI](https://www.radix-ui.com) / [shadcn/ui](https://ui.shadcn.com) |
+| Icons           | [Lucide React](https://lucide.dev)                                        |
+| Notifications   | [Sonner](https://sonner.emilkowal.ski)                                    |
+| Deployment      | [Vercel](https://vercel.com)                                              |
 
 ---
 
@@ -89,7 +53,3 @@ src/
 ```
 
 ---
-
-## Author
-
-Built by [Milton R.](https://github.com/Mrosa99)
