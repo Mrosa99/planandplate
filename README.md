@@ -2,7 +2,7 @@
 
 A full-stack meal planning web app where users can browse recipes, save favorites, organize meals into collections, and plan their weekly calendar. Built as a personal portfolio project.
 
-**Live:** [planandplate.vercel.app](https://planandplate.vercel.app)
+**Live:** [plan-and-plate](https://www.plan-and-plate.com)
 
 ---
 
