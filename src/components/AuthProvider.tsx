@@ -9,6 +9,7 @@ import { Logout } from "@/lib/supabase/user-auth";
 
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000;
 const ACTIVITY_EVENTS = ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "click"] as const;
+const LAST_ACTIVITY_KEY = "pp_last_activity";
 
 type AuthContextValue = {
   session: Session | null;
@@ -40,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (!session) localStorage.removeItem(LAST_ACTIVITY_KEY);
     });
 
     return () => subscription.unsubscribe();
@@ -52,12 +54,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .catch(() => {});
   }, [session?.user.id]);
 
+  // On session restore, check if the user was inactive for too long before returning
+  useEffect(() => {
+    if (!session) return;
+
+    const stored = localStorage.getItem(LAST_ACTIVITY_KEY);
+    if (stored && Date.now() - parseInt(stored, 10) > INACTIVITY_TIMEOUT) {
+      Logout().then(() => toast.info("You were logged out due to inactivity"));
+      return;
+    }
+
+    localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+  }, [session?.user.id]);
+
+  // Client-side inactivity timer while the tab is open
   useEffect(() => {
     if (!session) return;
 
     let timer: ReturnType<typeof setTimeout>;
 
     const reset = () => {
+      localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
       clearTimeout(timer);
       timer = setTimeout(async () => {
         await Logout();
