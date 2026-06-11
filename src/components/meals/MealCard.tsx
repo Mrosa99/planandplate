@@ -15,7 +15,7 @@ const MealCard = ({ meal, isFavorited, onToggleFavorite }: Props) => {
       href={`/recipes/${meal.id_meal}`}
       className="relative block h-72 rounded-2xl overflow-hidden group hover:scale-[1.02] transition-transform duration-300"
     >
-      {meal.image_url ? (
+      {meal.image_url?.startsWith("http") ? (
         <Image
           src={meal.image_url}
           alt={meal.name}
@@ -25,7 +25,9 @@ const MealCard = ({ meal, isFavorited, onToggleFavorite }: Props) => {
         />
       ) : (
         <div className="absolute inset-0 bg-muted flex items-center justify-center">
-          <span className="text-muted-foreground/30 text-5xl select-none">🍽️</span>
+          <span className={`select-none ${meal.image_url ? "text-6xl" : "text-muted-foreground/30 text-5xl"}`}>
+            {meal.image_url ?? "🍽️"}
+          </span>
         </div>
       )}
 
