@@ -14,7 +14,8 @@ export async function Login(email: string, password: string) {
 }
 
 export async function Signup(email: string, password: string, username: string) {
-  const { data: isTaken } = await supabase.rpc("is_username_taken", { username_to_check: username });
+  const { data: isTaken, error: rpcError } = await supabase.rpc("is_username_taken", { username_to_check: username });
+  if (rpcError) throw new Error("Something went wrong checking username availability. Please try again.");
   if (isTaken) throw new Error("Username is already taken.");
 
   const { data, error } = await supabase.auth.signUp({
